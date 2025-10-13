@@ -3,3 +3,5 @@ venv/
 .idea/
 .vscode/
 CHECKLIST.md
+___pycache___/
+src/src/__pycache__/
