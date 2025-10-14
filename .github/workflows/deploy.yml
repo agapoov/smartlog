@@ -7,9 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Build frontend + Deploy backend & frontend
     runs-on: ubuntu-latest
-
     env:
       NODE_VERSION: 20
       REMOTE_SERVER: 185.68.247.151
@@ -24,19 +22,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install and build frontend
-        working-directory: ./frontend
-        run: |
-          npm install --global yarn
-          yarn install
-          yarn build
-          echo "✅ Frontend built successfully"
-
       - name: Prepare SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -46,28 +31,33 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H $REMOTE_SERVER >> ~/.ssh/known_hosts
 
-      - name: Deploy frontend build and backend code
-        run: |
-          echo "🚀 Deploying to $REMOTE_SERVER..."
-          rsync -avz --delete --no-times --no-perms -e "ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT" \
-            backend/ $DEPLOY_USER@$REMOTE_SERVER:$DEPLOY_PATH/backend/
+      # - name: Build frontend
+      #   working-directory: ./frontend
+      #   run: |
+      #     npm install --global yarn
+      #     yarn install
+      #     yarn build
+      #     echo "✅ Frontend built successfully"
 
-          rsync -avz --delete --no-times --no-perms -e "ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT" \
-            frontend/build/ $DEPLOY_USER@$REMOTE_SERVER:$DEPLOY_PATH/frontend/
+      # - name: Deploy frontend build
+      #   run: |
+      #     echo "🚀 Deploying frontend build to $REMOTE_SERVER..."
+      #     rsync -avz --delete --no-times --no-perms -e "ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT" \
+      #       frontend/build/ $DEPLOY_USER@$REMOTE_SERVER:$DEPLOY_PATH/frontend/
 
-      - name: Apply backend migrations and restart service
+      - name: Update backend and restart service
         run: |
           ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT $DEPLOY_USER@$REMOTE_SERVER "bash -c '
             set -e
             cd $DEPLOY_PATH/backend &&
-            echo \"📦 Updating repository state...\"
+            echo \"📦 Updating repository state...\" &&
             git fetch --all &&
             git reset --hard origin/master &&
-            echo \"📦 Installing dependencies...\"
+            echo \"📦 Installing dependencies...\" &&
             source venv/bin/activate &&
             pip install -r requirements.txt &&
-            echo \"⚙️ Running migrations...\"
+            echo \"⚙️ Running migrations...\" &&
             python3 manage.py migrate &&
-            echo \"🔄 Restarting service...\"
+            echo \"🔄 Restarting service...\" &&
             sudo systemctl restart $SERVICE_NAME
           '"
