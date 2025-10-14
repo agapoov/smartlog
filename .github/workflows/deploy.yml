@@ -3,7 +3,7 @@ name: CI/CD
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
@@ -62,7 +62,7 @@ jobs:
             cd $DEPLOY_PATH/backend &&
             echo \"📦 Updating repository state...\"
             git fetch --all &&
-            git reset --hard origin/main &&
+            git reset --hard origin/master &&
             echo \"📦 Installing dependencies...\"
             source venv/bin/activate &&
             pip install -r requirements.txt &&
