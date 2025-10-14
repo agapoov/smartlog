@@ -49,7 +49,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT $DEPLOY_USER@$REMOTE_SERVER "bash -c '
             set -e
-            cd $DEPLOY_PATH/backend &&
+            cd $DEPLOY_PATH/backend/src &&
             echo \"📦 Updating repository state...\" &&
             git fetch --all &&
             git reset --hard origin/master &&
