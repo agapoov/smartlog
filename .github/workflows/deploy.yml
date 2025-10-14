@@ -2,27 +2,22 @@ name: CI/CD
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      NODE_VERSION: 20
       REMOTE_SERVER: 185.68.247.151
       DEPLOY_USER: deployer
-      DEPLOY_PORT: 22
       DEPLOY_PATH: /var/www/smartlog
       SERVICE_NAME: smartlog.service
-      REACT_APP_API_URL: https://smtlog.ru/
-      REACT_APP_WEBSOCKET_URL: wss://smtlog.ru/websocket/
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare SSH
+      - name: Setup SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
@@ -31,33 +26,32 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H $REMOTE_SERVER >> ~/.ssh/known_hosts
 
-      # - name: Build frontend
-      #   working-directory: ./frontend
-      #   run: |
-      #     npm install --global yarn
-      #     yarn install
-      #     yarn build
-      #     echo "✅ Frontend built successfully"
-
-      # - name: Deploy frontend build
-      #   run: |
-      #     echo "🚀 Deploying frontend build to $REMOTE_SERVER..."
-      #     rsync -avz --delete --no-times --no-perms -e "ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT" \
-      #       frontend/build/ $DEPLOY_USER@$REMOTE_SERVER:$DEPLOY_PATH/frontend/
-
-      - name: Update backend and restart service
+      - name: Deploy and build everything
         run: |
-          ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT $DEPLOY_USER@$REMOTE_SERVER "bash -c '
+          ssh -i ~/.ssh/id_rsa $DEPLOY_USER@$REMOTE_SERVER "bash -c '
             set -e
-            cd $DEPLOY_PATH/backend/src &&
-            echo \"📦 Updating repository state...\" &&
-            git fetch --all &&
-            git reset --hard origin/master &&
-            echo \"📦 Installing dependencies...\" &&
-            source venv/bin/activate &&
-            pip install -r requirements.txt &&
-            echo \"⚙️ Running migrations...\" &&
-            python3 manage.py migrate &&
-            echo \"🔄 Restarting service...\" &&
+            echo \"🚀 Starting full deployment...\"
+            
+            cd $DEPLOY_PATH/backend/src
+            
+            echo \"📦 Pulling latest code...\"
+            git fetch --all
+            git reset --hard origin/master
+            
+            echo \"🏗️ Building frontend...\"
+            cd ../frontend
+            npm install --global yarn
+            yarn install
+            yarn build
+            
+            echo \"🐍 Setting up backend...\"
+            cd ../backend/src
+            source venv/bin/activate
+            pip install -r requirements.txt
+            python3 manage.py migrate
+            
+            echo \"🔄 Restarting service...\"
             sudo systemctl restart $SERVICE_NAME
+            
+            echo \"✅ Deployment completed successfully!\"
           '"
