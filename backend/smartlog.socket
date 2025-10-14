@@ -1,0 +1,6 @@
+[Unit]
+Description=smartlog socket
+[Socket]
+ListenStream=/var/www/smartlog/smartlog.sock
+[Install]
+WantedBy=sockets.target

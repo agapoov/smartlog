@@ -28,7 +28,13 @@ SECRET_KEY = 'django-insecure-irvru-7-4f2zqfa+bdjw2uqe=+ke0x)11pvpz0cd+9^8o7*asj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "185.68.247.151", 
+    "smtlog.ru", 
+    "www.smtlog.ru",
+    "localhost",
+    "127.0.0.1"
+]
 
 
 # Application definition

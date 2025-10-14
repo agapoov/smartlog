@@ -1,0 +1,21 @@
+[Unit]
+Description=smartlog daemon
+Requires=smartlog.socket
+After=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/smartlog/backend/src/
+ExecStart=/var/www/smartlog/backend/venv/bin/uvicorn \
+        src.asgi:application \
+        --uds /var/www/smartlog/smartlog.sock \
+        --workers 1 \
+        --access-log \
+        --log-level info
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
