@@ -1,0 +1,73 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build frontend + Deploy backend & frontend
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_VERSION: 20
+      REMOTE_SERVER: 185.68.247.151
+      DEPLOY_USER: deployer
+      DEPLOY_PORT: 22
+      DEPLOY_PATH: /var/www/smartlog
+      SERVICE_NAME: smartlog.service
+      REACT_APP_API_URL: https://smtlog.ru/
+      REACT_APP_WEBSOCKET_URL: wss://smtlog.ru/websocket/
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install and build frontend
+        working-directory: ./frontend
+        run: |
+          npm install --global yarn
+          yarn install
+          yarn build
+          echo "✅ Frontend built successfully"
+
+      - name: Prepare SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $REMOTE_SERVER >> ~/.ssh/known_hosts
+
+      - name: Deploy frontend build and backend code
+        run: |
+          echo "🚀 Deploying to $REMOTE_SERVER..."
+          rsync -avz --delete --no-times --no-perms -e "ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT" \
+            backend/ $DEPLOY_USER@$REMOTE_SERVER:$DEPLOY_PATH/backend/
+
+          rsync -avz --delete --no-times --no-perms -e "ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT" \
+            frontend/build/ $DEPLOY_USER@$REMOTE_SERVER:$DEPLOY_PATH/frontend/
+
+      - name: Apply backend migrations and restart service
+        run: |
+          ssh -i ~/.ssh/id_rsa -p $DEPLOY_PORT $DEPLOY_USER@$REMOTE_SERVER "bash -c '
+            set -e
+            cd $DEPLOY_PATH/backend &&
+            echo \"📦 Updating repository state...\"
+            git fetch --all &&
+            git reset --hard origin/main &&
+            echo \"📦 Installing dependencies...\"
+            source venv/bin/activate &&
+            pip install -r requirements.txt &&
+            echo \"⚙️ Running migrations...\"
+            python3 manage.py migrate &&
+            echo \"🔄 Restarting service...\"
+            sudo systemctl restart $SERVICE_NAME
+          '"
