@@ -19,7 +19,7 @@ export const LoginForm = () => {
 		// 	navigate,
 		// })
 		setTimeout(() => {
-			navigate({ to: '/cargo/index/cargo' })
+			navigate({ to: '/' })
 		}, 500)
 	}
 
