@@ -52,7 +52,7 @@ export const CargoPage = () => {
 							rowKey={(r: Cargo) => `${r.name}-${r.cargo_type}-${r.cargo_weight}-${r.cargo_volume}`}
 							loading={isLoading}
 							columns={columns}
-							dataSource={data ?? []}
+							dataSource={data?.data ?? []}
 							pagination={false}
 						/>
 					</Card>
