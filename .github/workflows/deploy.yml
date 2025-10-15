@@ -26,17 +26,21 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H $REMOTE_SERVER >> ~/.ssh/known_hosts
 
-      - name: Deploy and build everything
+      - name: Force deploy and rebuild
         run: |
           ssh -i ~/.ssh/id_rsa $DEPLOY_USER@$REMOTE_SERVER "bash -c '
             set -e
-            echo \"🚀 Starting full deployment...\"
+            echo \"🚀 Starting forced deployment...\"
             
             cd $DEPLOY_PATH
             
-            echo \"📦 Pulling latest code...\"
+            echo \"🔄 Force resetting repository...\"
             git fetch --all
             git reset --hard origin/master
+            git clean -fd
+            
+            echo \"📦 Checking current commit...\"
+            git log -1 --oneline
             
             echo \"⚛️ Building frontend...\"
             cd $DEPLOY_PATH/frontend
