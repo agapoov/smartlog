@@ -6,3 +6,13 @@ export { authApi, $authHost, authErrorHandler, authUtils, type LoginRequest, typ
 
 // Экспорт token service
 export { tokenService } from '@/shared/lib/token-service'
+
+// Экспорт cargo фичи
+export {
+	cargoApi,
+	useCargoList,
+	useCreateCargo,
+	CargoType,
+	type Cargo,
+	type CreateCargoRequest,
+} from '@/features/cargo'

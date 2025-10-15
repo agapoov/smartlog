@@ -1,15 +1,11 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { authStore } from '@/features/auth'
+import { createFileRoute } from '@tanstack/react-router'
+
+import { CargoPage } from '@/widgets/CargoPage'
 
 export const Route = createFileRoute('/cargo/index/cargo')({
-	component: Login,
-	pendingComponent: () => {
-		if (authStore.isAuthenticated) {
-			throw redirect({ to: '/' })
-		}
-	},
+	component: Page,
 })
 
-function Login() {
+function Page() {
 	return <CargoPage />
 }

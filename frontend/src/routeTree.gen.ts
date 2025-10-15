@@ -23,96 +23,94 @@ const LoginIndexLazyImport = createFileRoute('/login/')()
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRoute,
+	id: '/',
+	path: '/',
+	getParentRoute: () => rootRoute,
 } as any)
 
 const LoginIndexLazyRoute = LoginIndexLazyImport.update({
-  id: '/login/',
-  path: '/login/',
-  getParentRoute: () => rootRoute,
+	id: '/login/',
+	path: '/login/',
+	getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/login/index.lazy').then((d) => d.Route))
 
 const CargoIndexCargoRoute = CargoIndexCargoImport.update({
-  id: '/cargo/index/cargo',
-  path: '/cargo/index/cargo',
-  getParentRoute: () => rootRoute,
+	id: '/cargo/index/cargo',
+	path: '/cargo/index/cargo',
+	getParentRoute: () => rootRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/cargo/index/cargo': {
-      id: '/cargo/index/cargo'
-      path: '/cargo/index/cargo'
-      fullPath: '/cargo/index/cargo'
-      preLoaderRoute: typeof CargoIndexCargoImport
-      parentRoute: typeof rootRoute
-    }
-  }
+	interface FileRoutesByPath {
+		'/': {
+			id: '/'
+			path: '/'
+			fullPath: '/'
+			preLoaderRoute: typeof IndexImport
+			parentRoute: typeof rootRoute
+		}
+		'/login/': {
+			id: '/login/'
+			path: '/login'
+			fullPath: '/login'
+			preLoaderRoute: typeof LoginIndexLazyImport
+			parentRoute: typeof rootRoute
+		}
+		'/cargo/index/cargo': {
+			id: '/cargo/index/cargo'
+			path: '/cargo/index/cargo'
+			fullPath: '/cargo/index/cargo'
+			preLoaderRoute: typeof CargoIndexCargoImport
+			parentRoute: typeof rootRoute
+		}
+	}
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/login': typeof LoginIndexLazyRoute
-  '/cargo/index/cargo': typeof CargoIndexCargoRoute
+	'/': typeof IndexRoute
+	'/login': typeof LoginIndexLazyRoute
+	'/cargo/index/cargo': typeof CargoIndexCargoRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/login': typeof LoginIndexLazyRoute
-  '/cargo/index/cargo': typeof CargoIndexCargoRoute
+	'/': typeof IndexRoute
+	'/login': typeof LoginIndexLazyRoute
+	'/cargo/index/cargo': typeof CargoIndexCargoRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/login/': typeof LoginIndexLazyRoute
-  '/cargo/index/cargo': typeof CargoIndexCargoRoute
+	__root__: typeof rootRoute
+	'/': typeof IndexRoute
+	'/login/': typeof LoginIndexLazyRoute
+	'/cargo/index/cargo': typeof CargoIndexCargoRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/cargo/index/cargo'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/cargo/index/cargo'
-  id: '__root__' | '/' | '/login/' | '/cargo/index/cargo'
-  fileRoutesById: FileRoutesById
+	fileRoutesByFullPath: FileRoutesByFullPath
+	fullPaths: '/' | '/login' | '/cargo/index/cargo'
+	fileRoutesByTo: FileRoutesByTo
+	to: '/' | '/login' | '/cargo/index/cargo'
+	id: '__root__' | '/' | '/login/' | '/cargo/index/cargo'
+	fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  LoginIndexLazyRoute: typeof LoginIndexLazyRoute
-  CargoIndexCargoRoute: typeof CargoIndexCargoRoute
+	IndexRoute: typeof IndexRoute
+	LoginIndexLazyRoute: typeof LoginIndexLazyRoute
+	CargoIndexCargoRoute: typeof CargoIndexCargoRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  LoginIndexLazyRoute: LoginIndexLazyRoute,
-  CargoIndexCargoRoute: CargoIndexCargoRoute,
+	IndexRoute: IndexRoute,
+	LoginIndexLazyRoute: LoginIndexLazyRoute,
+	CargoIndexCargoRoute: CargoIndexCargoRoute,
 }
 
-export const routeTree = rootRoute
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRoute._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
