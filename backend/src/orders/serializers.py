@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from datetime import date
+from django.utils import timezone
 from .models import Cargo, Order
 from .common import calculate_distance_haversine
 
@@ -46,22 +46,26 @@ class OrderCreateSerializer(OrderSerializer):
     duration = serializers.FloatField(required=False)
 
     def create(self, validated_data):
-        if 'producer' not in validated_data:
-            request = self.context.get('request')
-            if request and hasattr(request, 'user'):
-                validated_data['producer'] = request.user
-        
-        if 'distance' not in validated_data:
-            value = calculate_distance_haversine(self.initial_data['start_address'], self.initial_data['end_address'])
-            if not value:
-                raise serializers.ValidationError("Не удалось получить расстояние между городами")
-            validated_data['distance'] = value
-        if 'duration' not in validated_data:
-            validated_data['duration'] = validated_data['distance'] / 80
+        if "producer" not in validated_data:
+            request = self.context.get("request")
+            if request and hasattr(request, "user"):
+                validated_data["producer"] = request.user
+
+        value = calculate_distance_haversine(
+            self.initial_data.get("start_address"),
+            self.initial_data.get("end_address"),
+        )
+
+        if value is None:
+            value = 0
+
+        validated_data.setdefault("distance", value)
+        validated_data.setdefault("duration", value / 80 if value else 0)
+
         return super().create(validated_data)
 
     def validate_loading_date(self, value):
-        if value and value < date.today():
+        if value and value < timezone.now():
             raise serializers.ValidationError("Дата загрузки не может быть в прошлом")
         return value
 
