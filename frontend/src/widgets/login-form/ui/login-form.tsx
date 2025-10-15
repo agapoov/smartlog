@@ -1,6 +1,6 @@
 import { Form, Input, Button, Card, Typography, Space, Alert } from 'antd'
 import { UserOutlined, LockOutlined, LoginOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
-import { handleLogin, useAuthMutation, type LoginFormData } from '@/features/auth'
+import { useAuthMutation, type LoginFormData } from '@/features/auth'
 import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -9,17 +9,17 @@ const { Title, Text } = Typography
 export const LoginForm = () => {
 	const [form] = Form.useForm<LoginFormData>()
 
-	const { mutateAsync, isPending, error } = useAuthMutation()
+	const { isPending, error } = useAuthMutation()
 	const navigate = useNavigate()
 
-	const onSubmit = async (values: LoginFormData) => {
+	const onSubmit = async () => {
 		// handleLogin({
 		// 	values,
 		// 	mutateAsync,
 		// 	navigate,
 		// })
 		setTimeout(() => {
-			navigate({ to: '/cargo' })
+			navigate({ to: '/cargo/index/cargo' })
 		}, 500)
 	}
 
