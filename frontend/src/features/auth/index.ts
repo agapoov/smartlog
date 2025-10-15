@@ -1,0 +1,10 @@
+// Публичный API auth фичи
+export { authApi } from './api/auth-requests'
+export { $authHost } from './api/auth-client'
+export { authErrorHandler } from './lib/error-handler'
+export { authUtils } from './lib/auth-utils'
+export { authStore } from './store/auth.store'
+export { useAuthMutation } from './hooks/auth.hook'
+export type { LoginRequest, LoginFormData, TokenResponse } from './model/types'
+export { LoginRequestSchema, LoginFormSchema, TokenResponseSchema } from './model/types'
+export { handleLogin, handleFormFailed } from './lib/login-handler'
