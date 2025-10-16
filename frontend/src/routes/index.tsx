@@ -1,5 +1,5 @@
 import { authStore } from '@/features/auth'
-import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { Button, Card, Typography, Space } from 'antd'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { tokenService } from '@/shared/lib'
@@ -10,9 +10,9 @@ const { Title, Text } = Typography
 export const Route = createFileRoute('/')({
 	component: RouteComponent,
 	beforeLoad: async () => {
-		if (!authStore.isAuthenticated) {
-			throw redirect({ to: '/login' })
-		}
+		// if (!authStore.isAuthenticated) {
+		// 	throw redirect({ to: '/login' })
+		// }
 	},
 })
 

@@ -3,15 +3,15 @@ import { cargoApi } from '../api/cargo-api'
 import type { CreateCargoRequest, Cargo } from '../model/types'
 
 export const useCargoList = () =>
-	useQuery<Cargo[]>({
+	useQuery({
 		queryKey: ['cargo', 'list'],
-		queryFn: () => cargoApi.getList(),
+		queryFn: async () => await cargoApi.getList().then((res) => res.data),
 	})
 
 export const useCreateCargo = () => {
 	const queryClient = useQueryClient()
 	return useMutation<Cargo, Error, CreateCargoRequest>({
-		mutationFn: (payload) => cargoApi.create(payload),
+		mutationFn: (payload) => cargoApi.create(payload).then((res) => res.data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['cargo', 'list'] })
 		},
