@@ -12,6 +12,7 @@ from .serializers import UserRegistrationSerializer, UserSerializer
 @extend_schema(request=UserRegistrationSerializer, responses={201: UserSerializer})
 class RegisterView(APIView):
     """ API endpoint для регистрации пользователя."""
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
