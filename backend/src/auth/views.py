@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 
 from .serializers import UserRegistrationSerializer, UserSerializer
 
@@ -61,7 +61,7 @@ class LoginView(APIView):
 
 
 class UserProfileView(APIView):
-
+    """API для просмотра данных пользователя"""
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
@@ -70,10 +70,11 @@ class UserProfileView(APIView):
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def logout_view(request):
+    """
+    API для выхода пользователя из системы.
+    """
     try:
-        refresh_token = request.data.get('refresh_token')
-        token = RefreshToken(refresh_token)
-        token.blacklist()
+        logout(request.user)
         return Response({'message': 'Успешный выход из системы'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Ошибка выхода'}, status=status.HTTP_400_BAD_REQUEST)
