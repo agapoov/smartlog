@@ -1,24 +1,33 @@
 import { Form, Input, Button, Card, Typography, Space, Alert } from 'antd'
-import { UserOutlined, LockOutlined, LoginOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
-import { useAuthMutation, type LoginFormData } from '@/features/auth'
-import { useNavigate, Link } from '@tanstack/react-router'
+import { UserOutlined, LockOutlined, MailOutlined, LoginOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import { useAuthMutation } from '@/features/auth'
+import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const { Title, Text } = Typography
 
-export const LoginForm = () => {
-	const [form] = Form.useForm<LoginFormData>()
-	const { isPending, error, mutateAsync } = useAuthMutation('login')
+export interface RegisterFormData {
+	username: string
+	email: string
+	password: string
+	password2: string
+	first_name: string
+	last_name: string
+}
+
+export const RegisterForm = () => {
+	const [form] = Form.useForm<RegisterFormData>()
+	const { isPending, error, mutateAsync } = useAuthMutation('register')
 	const navigate = useNavigate()
 
-	const onSubmit = async (values: LoginFormData) => {
+	const onSubmit = async (values: RegisterFormData) => {
 		try {
 			await mutateAsync(values)
 			setTimeout(() => {
 				navigate({ to: '/' })
 			}, 500)
 		} catch (err) {
-			console.log('errAuth', err)
+			console.log('errRegister', err)
 		}
 	}
 
@@ -58,10 +67,10 @@ export const LoginForm = () => {
 								<LoginOutlined className="text-2xl" />
 							</motion.div>
 							<Title level={2} className="!m-0 !text-gray-800">
-								Добро пожаловать
+								Регистрация
 							</Title>
 							<Text type="secondary" className="text-base">
-								Войдите в свой аккаунт
+								Создайте новый аккаунт
 							</Text>
 						</motion.div>
 
@@ -81,7 +90,7 @@ export const LoginForm = () => {
 						</AnimatePresence>
 
 						<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
-							<Form form={form} name="login" onFinish={onSubmit} autoComplete="off" size="large">
+							<Form form={form} name="register" onFinish={onSubmit} autoComplete="off" size="large">
 								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
 									<Form.Item
 										name="username"
@@ -93,6 +102,22 @@ export const LoginForm = () => {
 										<Input
 											prefix={<UserOutlined style={{ color: '#667eea' }} />}
 											placeholder="Имя пользователя"
+											className="rounded-lg h-11 border-gray-200 transition-all duration-300 ease-in-out focus:border-indigo-500"
+										/>
+									</Form.Item>
+								</motion.div>
+
+								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
+									<Form.Item
+										name="email"
+										rules={[
+											{ required: true, message: 'Пожалуйста, введите email!' },
+											{ type: 'email', message: 'Неверный формат email!' },
+										]}
+									>
+										<Input
+											prefix={<MailOutlined style={{ color: '#667eea' }} />}
+											placeholder="Email"
 											className="rounded-lg h-11 border-gray-200 transition-all duration-300 ease-in-out focus:border-indigo-500"
 										/>
 									</Form.Item>
@@ -115,7 +140,50 @@ export const LoginForm = () => {
 								</motion.div>
 
 								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
-									<Form.Item className="!mb-4">
+									<Form.Item
+										name="password2"
+										rules={[
+											{ required: true, message: 'Пожалуйста, подтвердите пароль!' },
+											({ getFieldValue }) => ({
+												validator(_, value) {
+													if (!value || getFieldValue('password') === value) {
+														return Promise.resolve()
+													}
+													return Promise.reject(new Error('Пароли не совпадают!'))
+												},
+											}),
+										]}
+									>
+										<Input.Password
+											prefix={<LockOutlined style={{ color: '#667eea' }} />}
+											placeholder="Подтвердите пароль"
+											className="rounded-lg h-11 border-gray-200 transition-all duration-300 ease-in-out focus:border-indigo-500"
+										/>
+									</Form.Item>
+								</motion.div>
+
+								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
+									<Form.Item name="first_name" rules={[{ required: true, message: 'Пожалуйста, введите имя!' }]}>
+										<Input
+											prefix={<UserOutlined style={{ color: '#667eea' }} />}
+											placeholder="Имя"
+											className="rounded-lg h-11 border-gray-200 transition-all duration-300 ease-in-out focus:border-indigo-500"
+										/>
+									</Form.Item>
+								</motion.div>
+
+								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
+									<Form.Item name="last_name" rules={[{ required: true, message: 'Пожалуйста, введите фамилию!' }]}>
+										<Input
+											prefix={<UserOutlined style={{ color: '#667eea' }} />}
+											placeholder="Фамилия"
+											className="rounded-lg h-11 border-gray-200 transition-all duration-300 ease-in-out focus:border-indigo-500"
+										/>
+									</Form.Item>
+								</motion.div>
+
+								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
+									<Form.Item className="!mb-0">
 										<motion.div
 											whileHover={{ scale: 1.04 }}
 											whileTap={{ scale: 0.98 }}
@@ -133,22 +201,10 @@ export const LoginForm = () => {
 													boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
 												}}
 											>
-												{isPending ? 'Выполняется вход...' : 'Войти'}
+												{isPending ? 'Регистрация...' : 'Зарегистрироваться'}
 											</Button>
 										</motion.div>
 									</Form.Item>
-								</motion.div>
-
-								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
-									<Text type="secondary" className="text-center block">
-										Нет аккаунта?{' '}
-										<Link
-											to="/register/index/register"
-											className="text-indigo-600 hover:text-indigo-800 transition-colors"
-										>
-											Зарегистрируйтесь
-										</Link>
-									</Text>
 								</motion.div>
 							</Form>
 						</motion.div>

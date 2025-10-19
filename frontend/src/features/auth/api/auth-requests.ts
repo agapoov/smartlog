@@ -4,8 +4,30 @@ import { type LoginRequest, type TokenResponse, TokenResponseSchema, RefreshResp
 import { authStore } from '../store/auth.store'
 import { redirect } from '@tanstack/react-router'
 
-// API методы аутентификации
+export interface RegisterRequest {
+	username: string
+	email: string
+	password: string
+	password2: string
+	first_name: string
+	last_name: string
+}
+
 export const authApi = {
+	// Регистрация нового пользователя
+	async register(credentials: RegisterRequest): Promise<TokenResponse> {
+		const response = await $host.post('api/register/', credentials)
+		const validatedData = TokenResponseSchema.parse(response.data)
+
+		// Сохраняем токены
+		tokenService.setAccess(validatedData.access)
+		tokenService.setRefresh(validatedData.refresh)
+
+		authStore.isAuthenticated = true
+
+		return validatedData
+	},
+
 	// Вход в систему
 	async login(credentials: LoginRequest): Promise<TokenResponse> {
 		const response = await $host.post('api/login/', credentials)

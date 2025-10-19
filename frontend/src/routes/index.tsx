@@ -54,9 +54,12 @@ function RouteComponent() {
 							<Title level={4}>Заказы</Title>
 							<Text type="secondary">Перейти в отображение и создание заказов</Text>
 						</Card>
-						<div className="mt-8">
+						<div className="mt-8 space-x-4">
 							<Link to="/login">
 								<Button type="link">Перейти к странице входа</Button>
+							</Link>
+							<Link to="/about">
+								<Button type="link">О нас</Button>
 							</Link>
 						</div>
 					</Space>
