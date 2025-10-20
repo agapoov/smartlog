@@ -14,6 +14,11 @@ class AuthStore {
 
 	constructor() {
 		this._isAuthenticated = tokenService.hasValidTokens()
+
+		if (!this._isAuthenticated) {
+			tokenService.clear()
+		}
+
 		makeAutoObservable(this)
 	}
 }
