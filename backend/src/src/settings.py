@@ -29,6 +29,9 @@ SECRET_KEY = 'django-insecure-irvru-7-4f2zqfa+bdjw2uqe=+ke0x)11pvpz0cd+9^8o7*asj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ATI_SU_API_KEY=os.getenv("ATI_SU_API_KEY")
+
+
 ALLOWED_HOSTS = [
     "185.68.247.151", 
     "smtlog.ru", 
@@ -70,6 +73,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     "orders",
+    "integrations",
 ]
 
 MIDDLEWARE = [
@@ -176,7 +180,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
