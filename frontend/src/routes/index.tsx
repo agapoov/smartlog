@@ -25,8 +25,8 @@ function RouteComponent() {
 		navigate({ to: '/login' })
 	}
 
-	const handleCardClick = () => {
-		navigate({ to: '/cargo/index/cargo' })
+	const handleNavigateTo = (to: string) => {
+		navigate({ to })
 	}
 
 	return (
@@ -44,24 +44,24 @@ function RouteComponent() {
 										Добро пожаловать в систему
 									</Title>
 									<Text type="secondary">Вы успешно авторизованы</Text>
+									<Link to="/about">
+										<Button type="link">О нас</Button>
+									</Link>
 								</div>
 							</div>
 							<Button type="default" icon={<LogoutOutlined />} onClick={handleLogout} className="rounded-lg">
 								Выйти
 							</Button>
 						</div>
-						<Card onClick={handleCardClick} hoverable>
+						<Card onClick={() => handleNavigateTo('/cargo')} hoverable>
+							<Title level={4}>Грузы</Title>
+							<Text type="secondary">Перейти в отображение и создание Грузов</Text>
+						</Card>
+
+						<Card onClick={() => handleNavigateTo('/orders')} hoverable>
 							<Title level={4}>Заказы</Title>
 							<Text type="secondary">Перейти в отображение и создание заказов</Text>
 						</Card>
-						<div className="mt-8 space-x-4">
-							<Link to="/login">
-								<Button type="link">Перейти к странице входа</Button>
-							</Link>
-							<Link to="/about">
-								<Button type="link">О нас</Button>
-							</Link>
-						</div>
 					</Space>
 				</Card>
 			</div>

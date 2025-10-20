@@ -15,12 +15,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as AboutIndexImport } from './routes/about/index'
-import { Route as RegisterIndexRegisterImport } from './routes/register/index.register'
-import { Route as CargoIndexCargoImport } from './routes/cargo/index.cargo'
 
 // Create Virtual Routes
 
+const RegisterIndexLazyImport = createFileRoute('/register/')()
+const OrdersIndexLazyImport = createFileRoute('/orders/')()
 const LoginIndexLazyImport = createFileRoute('/login/')()
+const CargoIndexLazyImport = createFileRoute('/cargo/')()
 
 // Create/Update Routes
 
@@ -30,27 +31,35 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const RegisterIndexLazyRoute = RegisterIndexLazyImport.update({
+  id: '/register/',
+  path: '/register/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/register/index.lazy').then((d) => d.Route),
+)
+
+const OrdersIndexLazyRoute = OrdersIndexLazyImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/orders/index.lazy').then((d) => d.Route))
+
 const LoginIndexLazyRoute = LoginIndexLazyImport.update({
   id: '/login/',
   path: '/login/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/login/index.lazy').then((d) => d.Route))
 
+const CargoIndexLazyRoute = CargoIndexLazyImport.update({
+  id: '/cargo/',
+  path: '/cargo/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/cargo/index.lazy').then((d) => d.Route))
+
 const AboutIndexRoute = AboutIndexImport.update({
   id: '/about/',
   path: '/about/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const RegisterIndexRegisterRoute = RegisterIndexRegisterImport.update({
-  id: '/register/index/register',
-  path: '/register/index/register',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const CargoIndexCargoRoute = CargoIndexCargoImport.update({
-  id: '/cargo/index/cargo',
-  path: '/cargo/index/cargo',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -72,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutIndexImport
       parentRoute: typeof rootRoute
     }
+    '/cargo/': {
+      id: '/cargo/'
+      path: '/cargo'
+      fullPath: '/cargo'
+      preLoaderRoute: typeof CargoIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -79,18 +95,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginIndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/cargo/index/cargo': {
-      id: '/cargo/index/cargo'
-      path: '/cargo/index/cargo'
-      fullPath: '/cargo/index/cargo'
-      preLoaderRoute: typeof CargoIndexCargoImport
+    '/orders/': {
+      id: '/orders/'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersIndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/register/index/register': {
-      id: '/register/index/register'
-      path: '/register/index/register'
-      fullPath: '/register/index/register'
-      preLoaderRoute: typeof RegisterIndexRegisterImport
+    '/register/': {
+      id: '/register/'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterIndexLazyImport
       parentRoute: typeof rootRoute
     }
   }
@@ -101,67 +117,63 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutIndexRoute
+  '/cargo': typeof CargoIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
-  '/cargo/index/cargo': typeof CargoIndexCargoRoute
-  '/register/index/register': typeof RegisterIndexRegisterRoute
+  '/orders': typeof OrdersIndexLazyRoute
+  '/register': typeof RegisterIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutIndexRoute
+  '/cargo': typeof CargoIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
-  '/cargo/index/cargo': typeof CargoIndexCargoRoute
-  '/register/index/register': typeof RegisterIndexRegisterRoute
+  '/orders': typeof OrdersIndexLazyRoute
+  '/register': typeof RegisterIndexLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about/': typeof AboutIndexRoute
+  '/cargo/': typeof CargoIndexLazyRoute
   '/login/': typeof LoginIndexLazyRoute
-  '/cargo/index/cargo': typeof CargoIndexCargoRoute
-  '/register/index/register': typeof RegisterIndexRegisterRoute
+  '/orders/': typeof OrdersIndexLazyRoute
+  '/register/': typeof RegisterIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/about'
-    | '/login'
-    | '/cargo/index/cargo'
-    | '/register/index/register'
+  fullPaths: '/' | '/about' | '/cargo' | '/login' | '/orders' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/about'
-    | '/login'
-    | '/cargo/index/cargo'
-    | '/register/index/register'
+  to: '/' | '/about' | '/cargo' | '/login' | '/orders' | '/register'
   id:
     | '__root__'
     | '/'
     | '/about/'
+    | '/cargo/'
     | '/login/'
-    | '/cargo/index/cargo'
-    | '/register/index/register'
+    | '/orders/'
+    | '/register/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutIndexRoute: typeof AboutIndexRoute
+  CargoIndexLazyRoute: typeof CargoIndexLazyRoute
   LoginIndexLazyRoute: typeof LoginIndexLazyRoute
-  CargoIndexCargoRoute: typeof CargoIndexCargoRoute
-  RegisterIndexRegisterRoute: typeof RegisterIndexRegisterRoute
+  OrdersIndexLazyRoute: typeof OrdersIndexLazyRoute
+  RegisterIndexLazyRoute: typeof RegisterIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutIndexRoute: AboutIndexRoute,
+  CargoIndexLazyRoute: CargoIndexLazyRoute,
   LoginIndexLazyRoute: LoginIndexLazyRoute,
-  CargoIndexCargoRoute: CargoIndexCargoRoute,
-  RegisterIndexRegisterRoute: RegisterIndexRegisterRoute,
+  OrdersIndexLazyRoute: OrdersIndexLazyRoute,
+  RegisterIndexLazyRoute: RegisterIndexLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -176,9 +188,10 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about/",
+        "/cargo/",
         "/login/",
-        "/cargo/index/cargo",
-        "/register/index/register"
+        "/orders/",
+        "/register/"
       ]
     },
     "/": {
@@ -187,14 +200,17 @@ export const routeTree = rootRoute
     "/about/": {
       "filePath": "about/index.tsx"
     },
+    "/cargo/": {
+      "filePath": "cargo/index.lazy.tsx"
+    },
     "/login/": {
       "filePath": "login/index.lazy.tsx"
     },
-    "/cargo/index/cargo": {
-      "filePath": "cargo/index.cargo.tsx"
+    "/orders/": {
+      "filePath": "orders/index.lazy.tsx"
     },
-    "/register/index/register": {
-      "filePath": "register/index.register.tsx"
+    "/register/": {
+      "filePath": "register/index.lazy.tsx"
     }
   }
 }
