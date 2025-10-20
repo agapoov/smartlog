@@ -1,7 +1,7 @@
 import { authStore } from '@/features/auth'
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router'
 import { Button, Card, Typography, Space } from 'antd'
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
+import { LogoutOutlined, OrderedListOutlined, TruckOutlined, UserOutlined } from '@ant-design/icons'
 import { tokenService } from '@/shared/lib'
 import { AppLayout } from '@/shared/ui'
 
@@ -10,9 +10,9 @@ const { Title, Text } = Typography
 export const Route = createFileRoute('/')({
 	component: RouteComponent,
 	beforeLoad: async () => {
-		// if (!authStore.isAuthenticated) {
-		// 	throw redirect({ to: '/login' })
-		// }
+		if (!authStore.isAuthenticated) {
+			throw redirect({ to: '/login' })
+		}
 	},
 })
 
@@ -20,13 +20,13 @@ function RouteComponent() {
 	const navigate = useNavigate()
 
 	const handleLogout = () => {
-		tokenService.clear()
 		authStore.isAuthenticated = false
-		navigate({ to: '/login' })
+		tokenService.clear()
+		window.location.href = '/login'
 	}
 
-	const handleCardClick = () => {
-		navigate({ to: '/cargo/index/cargo' })
+	const handleNavigateTo = (to: string) => {
+		navigate({ to })
 	}
 
 	return (
@@ -44,24 +44,30 @@ function RouteComponent() {
 										Добро пожаловать в систему
 									</Title>
 									<Text type="secondary">Вы успешно авторизованы</Text>
+									<Link to="/about">
+										<Button type="link">О нас</Button>
+									</Link>
 								</div>
 							</div>
 							<Button type="default" icon={<LogoutOutlined />} onClick={handleLogout} className="rounded-lg">
 								Выйти
 							</Button>
 						</div>
-						<Card onClick={handleCardClick} hoverable>
-							<Title level={4}>Заказы</Title>
-							<Text type="secondary">Перейти в отображение и создание заказов</Text>
+						<Card onClick={() => handleNavigateTo('/cargo')} hoverable>
+							<div className="flex flex-row gap-5 items-start">
+								<TruckOutlined className="text-4xl" />
+								<Title level={4}>Грузы</Title>
+								<Text type="secondary">Перейти в отображение и создание Грузов</Text>
+							</div>
 						</Card>
-						<div className="mt-8 space-x-4">
-							<Link to="/login">
-								<Button type="link">Перейти к странице входа</Button>
-							</Link>
-							<Link to="/about">
-								<Button type="link">О нас</Button>
-							</Link>
-						</div>
+
+						<Card onClick={() => handleNavigateTo('/orders')} hoverable>
+							<div className="flex flex-row gap-5 items-start">
+								<OrderedListOutlined className="text-3xl" />
+								<Title level={4}>Заказы</Title>
+								<Text type="secondary">Перейти в отображение и создание заказов</Text>
+							</div>
+						</Card>
 					</Space>
 				</Card>
 			</div>

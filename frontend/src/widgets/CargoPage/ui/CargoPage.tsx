@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
-import { AppLayout, Button, Card, Form, Input, Modal, Select, Space, Table, Typography } from '@/shared/ui'
+import { AppLayout, Button, Card, Form, Input, Modal, Select, Space, Table } from '@/shared/ui'
 import { useCargoList, useCreateCargo, CargoType, type CreateCargoRequest, type Cargo } from '@/shared/api'
-
-const { Title } = Typography
+import { AppHeader } from '@/shared/ui/AppHeader'
 
 const cargoTypeOptions = Object.values(CargoType).map((value) => ({ label: value, value }))
 
@@ -28,8 +27,8 @@ export const CargoPage = () => {
 			await createMutation.mutateAsync(values)
 			form.resetFields()
 			setOpen(false)
-		} catch {
-			// валидация уже подсветит поля
+		} catch (err) {
+			console.log('errModalAdd cargo', err)
 		}
 	}
 
@@ -37,9 +36,7 @@ export const CargoPage = () => {
 		<AppLayout>
 			<div className="max-w-5xl mx-auto pt-8">
 				<Space direction="vertical" size="large" className="w-full">
-					<Title level={2} className="!m-0">
-						Грузы
-					</Title>
+					<AppHeader showGoBack title="Грузы" />
 					<Card
 						title="Список грузов"
 						extra={
