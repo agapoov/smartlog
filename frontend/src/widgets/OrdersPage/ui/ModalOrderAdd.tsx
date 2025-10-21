@@ -61,16 +61,7 @@ export const ModalOrderAdd: FC<IProps> = ({ open, setOpen }) => {
 				>
 					<Input placeholder="Например: Москва" />
 				</Form.Item>
-				<Form.Item label="Расстояние, км" name="distance" rules={[{ required: true, message: 'Укажите расстояние' }]}>
-					<Input type="number" min={0} placeholder="Например: 563.42" />
-				</Form.Item>
-				<Form.Item
-					label="Длительность, ч"
-					name="duration"
-					rules={[{ required: true, message: 'Укажите длительность' }]}
-				>
-					<Input type="number" min={0} placeholder="Например: 7.04" />
-				</Form.Item>
+
 				<Form.Item
 					label="Дата загрузки"
 					name="loading_date"

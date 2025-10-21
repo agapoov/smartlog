@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { AppLayout, Button, Card, Space, Table } from '@/shared/ui'
 import { useOrdersList } from '@/features/orders'
 import type { Order } from '@/features/orders/model/types'
@@ -16,8 +17,18 @@ export const OrdersPage = () => {
 			{ title: 'ID', dataIndex: 'id', key: 'id' },
 			{ title: 'Начальный адрес', dataIndex: 'start_address', key: 'start_address' },
 			{ title: 'Конечный адрес', dataIndex: 'end_address', key: 'end_address' },
-			{ title: 'Расстояние, км', dataIndex: 'distance', key: 'distance' },
-			{ title: 'Длительность, ч', dataIndex: 'duration', key: 'duration' },
+			{
+				title: 'Расстояние, км',
+				dataIndex: 'distance',
+				key: 'distance',
+				render: (value: number) => (value ? value.toFixed(1) : '-'),
+			},
+			{
+				title: 'Длительность, ч',
+				dataIndex: 'duration',
+				key: 'duration',
+				render: (value: number) => (value ? value.toFixed(1) : '-'),
+			},
 			{
 				title: 'Дата загрузки',
 				dataIndex: 'loading_date',
@@ -26,6 +37,15 @@ export const OrdersPage = () => {
 			},
 			{ title: 'Цена, ₽', dataIndex: 'price', key: 'price' },
 			{ title: 'ID груза', dataIndex: 'cargo', key: 'cargo' },
+			{
+				title: 'Действия',
+				key: 'actions',
+				render: (_: unknown, record: Order) => (
+					<Link to="/offers/$id" params={{ id: String(record.id) }}>
+						<Button type="link">Предложения</Button>
+					</Link>
+				),
+			},
 		],
 		[],
 	)
