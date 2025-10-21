@@ -31,7 +31,7 @@ export const OfferCoefficientPieChart = ({ offers }: OfferCoefficientPieChartPro
 				fill="#8884d8"
 				label={({ name, percent }) => `${name} ${(Number(percent) * 100).toFixed(1)}%`}
 			>
-				{data.map((entry, index) => (
+				{data.map((_, index) => (
 					<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
 				))}
 			</Pie>
