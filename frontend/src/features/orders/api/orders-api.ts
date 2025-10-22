@@ -7,7 +7,7 @@ export const ordersApi = {
 	},
 
 	async getItem(id: number) {
-		return $authHost.get<Order>(`api/orders/${id}`)
+		return $authHost.get<{ data: Order }>(`api/orders/${id}`)
 	},
 
 	async create(payload: CreateOrdersRequest) {

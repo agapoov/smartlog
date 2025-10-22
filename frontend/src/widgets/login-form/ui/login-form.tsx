@@ -142,10 +142,7 @@ export const LoginForm = () => {
 								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
 									<Text type="secondary" className="text-center block">
 										Нет аккаунта?{' '}
-										<Link
-											to="/register/index/register"
-											className="text-indigo-600 hover:text-indigo-800 transition-colors"
-										>
+										<Link to="/register" className="text-indigo-600 hover:text-indigo-800 transition-colors">
 											Зарегистрируйтесь
 										</Link>
 									</Text>
