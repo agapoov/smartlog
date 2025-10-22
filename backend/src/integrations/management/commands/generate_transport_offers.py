@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from integrations.models import TransportOffer
+from orders.models import Cargo
 import random
 import json
 import os
@@ -94,10 +95,7 @@ class Command(BaseCommand):
             "Междуреченск", "Анжеро-Судженск", "Юрга", "Бердск", "Искитим"
         ]
         
-        cargo_types = [
-            "general", "bulk", "liquid", "container", "refrigerated", 
-            "dangerous", "oversized", "animals", "perishable", "other"
-        ]
+        cargo_types = [choice[0] for choice in Cargo.CargoType.choices]
         
         with transaction.atomic():
             TransportOffer.objects.all().delete()
@@ -126,18 +124,16 @@ class Command(BaseCommand):
                         carrier_rating = round(random.uniform(3.0, 5.0), 1)
                         reliability_score = round(random.uniform(0.3, 1.0), 3)
                     
-                    base_price = random.uniform(5000, 250000)
-                    price_variation = random.uniform(0.8, 1.3)
-                    price = round(base_price * price_variation, 2)
-                    
                     delivery_time = random.randint(1, 48)
+                    
+                    price_per_km = round(random.uniform(30, 60), 2)
                     
                     TransportOffer.objects.create(
                         order=None,
                         carrier_name=carrier_name,
                         carrier_inn=carrier_inn,
                         carrier_rating=carrier_rating,
-                        price=price,
+                        price_per_km=price_per_km,
                         delivery_time=delivery_time,
                         reliability_score=reliability_score,
                         from_city=from_city,

@@ -11,7 +11,7 @@ class TransportOffer(models.Model):
     carrier_name = models.CharField(max_length=255, help_text="Название перевозчика")
     carrier_inn = models.CharField(max_length=12, help_text="ИНН перевозчика")
     carrier_rating = models.FloatField(help_text="Рейтинг перевозчика (0-5)")
-    price = models.FloatField(help_text="Цена предложения")
+    price_per_km = models.FloatField(help_text="Цена за 1 км пути в рублях")
     delivery_time = models.IntegerField(help_text="Время доставки в часах")
     reliability_score = models.FloatField(help_text="Коэффициент надежности (0-1)")
     
@@ -24,7 +24,7 @@ class TransportOffer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['-reliability_score', 'price']
+        ordering = ['-reliability_score']
 
 class TransportResponse(models.Model):
     """Отклик на предложение перевозчика"""
@@ -39,6 +39,7 @@ class TransportResponse(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='transport_responses')
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     comment = models.TextField(help_text="Комментарий перевозчика", blank=True, null=True)
+    price = models.FloatField(help_text="Итоговая цена предложения", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
