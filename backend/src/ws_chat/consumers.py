@@ -17,17 +17,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
         # Проверяем аутентификацию
         if not self.scope['user'].is_authenticated:
-            print(f"WebSocket: User not authenticated")
             await self.close(code=4001)
             return
         
         # Проверяем участие в чате
         if not await self.is_participant():
-            print(f"WebSocket: User {self.scope['user'].username} not participant of chat {self.chat_id}")
             await self.close(code=4003)
             return
-        
-        print(f"WebSocket: User {self.scope['user'].username} connected to chat {self.chat_id}")
         
         await self.channel_layer.group_add(
             self.chat_group_name,
@@ -51,8 +47,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             data = json.loads(text_data)
             message_type = data.get('type')
             
-            if not self.scope['user'].is_authenticated:
-                return
             
             if message_type == 'chat_message':
                 await self.handle_chat_message(data)
