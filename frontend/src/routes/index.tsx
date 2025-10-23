@@ -1,18 +1,25 @@
 import { authStore } from '@/features/auth'
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router'
 import { Button, Card, Typography, Space } from 'antd'
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
+import {
+	DollarCircleOutlined,
+	LogoutOutlined,
+	OrderedListOutlined,
+	TruckOutlined,
+	UserOutlined,
+} from '@ant-design/icons'
 import { tokenService } from '@/shared/lib'
 import { AppLayout } from '@/shared/ui'
+import { BulbFilled } from '@ant-design/icons' // Replaced with BulbFilled
 
 const { Title, Text } = Typography
 
 export const Route = createFileRoute('/')({
 	component: RouteComponent,
 	beforeLoad: async () => {
-		// if (!authStore.isAuthenticated) {
-		// 	throw redirect({ to: '/login' })
-		// }
+		if (!authStore.isAuthenticated) {
+			throw redirect({ to: '/login' })
+		}
 	},
 })
 
@@ -20,13 +27,13 @@ function RouteComponent() {
 	const navigate = useNavigate()
 
 	const handleLogout = () => {
-		tokenService.clear()
 		authStore.isAuthenticated = false
-		navigate({ to: '/login' })
+		tokenService.clear()
+		window.location.href = '/login'
 	}
 
-	const handleCardClick = () => {
-		navigate({ to: '/cargo/index/cargo' })
+	const handleNavigateTo = (to: string) => {
+		navigate({ to })
 	}
 
 	return (
@@ -46,19 +53,39 @@ function RouteComponent() {
 									<Text type="secondary">Вы успешно авторизованы</Text>
 								</div>
 							</div>
-							<Button type="default" icon={<LogoutOutlined />} onClick={handleLogout} className="rounded-lg">
-								Выйти
-							</Button>
+							<div className="flex gap-5">
+								<Link to="/about">
+									<Button icon={<BulbFilled />}>О нас</Button>
+								</Link>
+								<Button type="default" icon={<LogoutOutlined />} onClick={handleLogout} className="rounded-lg">
+									Выйти
+								</Button>
+							</div>
 						</div>
-						<Card onClick={handleCardClick} hoverable>
-							<Title level={4}>Заказы</Title>
-							<Text type="secondary">Перейти в отображение и создание заказов</Text>
+						<Card onClick={() => handleNavigateTo('/cargo')} hoverable>
+							<div className="flex flex-row gap-5 items-start">
+								<TruckOutlined className="text-4xl" />
+								<Title level={4}>Грузы</Title>
+								<Text type="secondary">Перейти в отображение и создание Грузов</Text>
+							</div>
 						</Card>
-						<div className="mt-8">
-							<Link to="/login">
-								<Button type="link">Перейти к странице входа</Button>
-							</Link>
-						</div>
+
+						<Card onClick={() => handleNavigateTo('/orders')} hoverable>
+							<div className="flex flex-row gap-5 items-start">
+								<OrderedListOutlined className="text-3xl" />
+								<Title level={4}>Заказы</Title>
+								<Text type="secondary">Перейти в отображение и создание заказов</Text>
+							</div>
+						</Card>
+						<Card onClick={() => handleNavigateTo('/responses')} hoverable>
+							<div className="flex flex-row gap-5 items-start">
+								<DollarCircleOutlined className="text-3xl" />
+								<Title level={4}>Отклики</Title>
+								<Text type="secondary" className="mt-1">
+									Перейти в отображение откликов
+								</Text>
+							</div>
+						</Card>
 					</Space>
 				</Card>
 			</div>

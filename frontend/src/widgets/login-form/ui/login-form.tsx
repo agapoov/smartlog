@@ -1,26 +1,25 @@
 import { Form, Input, Button, Card, Typography, Space, Alert } from 'antd'
 import { UserOutlined, LockOutlined, LoginOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { useAuthMutation, type LoginFormData } from '@/features/auth'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const { Title, Text } = Typography
 
 export const LoginForm = () => {
 	const [form] = Form.useForm<LoginFormData>()
-
-	const { isPending, error } = useAuthMutation()
+	const { isPending, error, mutateAsync } = useAuthMutation('login')
 	const navigate = useNavigate()
 
-	const onSubmit = async () => {
-		// handleLogin({
-		// 	values,
-		// 	mutateAsync,
-		// 	navigate,
-		// })
-		setTimeout(() => {
-			navigate({ to: '/' })
-		}, 500)
+	const onSubmit = async (values: LoginFormData) => {
+		try {
+			await mutateAsync(values)
+			setTimeout(() => {
+				navigate({ to: '/' })
+			}, 500)
+		} catch (err) {
+			console.log('errAuth', err)
+		}
 	}
 
 	return (
@@ -116,7 +115,7 @@ export const LoginForm = () => {
 								</motion.div>
 
 								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
-									<Form.Item className="!mb-0">
+									<Form.Item className="!mb-4">
 										<motion.div
 											whileHover={{ scale: 1.04 }}
 											whileTap={{ scale: 0.98 }}
@@ -138,6 +137,15 @@ export const LoginForm = () => {
 											</Button>
 										</motion.div>
 									</Form.Item>
+								</motion.div>
+
+								<motion.div animate={{ opacity: [0, 1], transition: { ease: ['easeIn', 'easeOut'] } }}>
+									<Text type="secondary" className="text-center block">
+										Нет аккаунта?{' '}
+										<Link to="/register" className="text-indigo-600 hover:text-indigo-800 transition-colors">
+											Зарегистрируйтесь
+										</Link>
+									</Text>
 								</motion.div>
 							</Form>
 						</motion.div>

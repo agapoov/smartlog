@@ -23,6 +23,11 @@ class Order(models.Model): # заказ
 
     price = models.FloatField(help_text="Цена за заказ в рублях", null=True, blank=True)
 
+    ati_id = models.BigIntegerField(
+        null=True, blank=True,
+        help_text="ID заказа (deal) на ATI.SU"
+    )
+
     class Meta:
         indexes = [
             models.Index(fields=['producer', 'created_at']),
@@ -56,3 +61,8 @@ class Cargo(models.Model): # груз
     )
 
     description = models.CharField(max_length=512, help_text="Описание груза", null=True, blank=True)
+
+    ati_id = models.BigIntegerField(
+        null=True, blank=True, 
+        help_text="ID груза на ATI.SU"
+    )

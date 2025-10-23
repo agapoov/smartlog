@@ -14,103 +14,229 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as CargoIndexCargoImport } from './routes/cargo/index.cargo'
+import { Route as AboutIndexImport } from './routes/about/index'
+import { Route as OffersIdImport } from './routes/offers/$id'
 
 // Create Virtual Routes
 
+const ResponsesIndexLazyImport = createFileRoute('/responses/')()
+const RegisterIndexLazyImport = createFileRoute('/register/')()
+const OrdersIndexLazyImport = createFileRoute('/orders/')()
 const LoginIndexLazyImport = createFileRoute('/login/')()
+const CargoIndexLazyImport = createFileRoute('/cargo/')()
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
-	id: '/',
-	path: '/',
-	getParentRoute: () => rootRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRoute,
 } as any)
 
+const ResponsesIndexLazyRoute = ResponsesIndexLazyImport.update({
+  id: '/responses/',
+  path: '/responses/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/responses/index.lazy').then((d) => d.Route),
+)
+
+const RegisterIndexLazyRoute = RegisterIndexLazyImport.update({
+  id: '/register/',
+  path: '/register/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/register/index.lazy').then((d) => d.Route),
+)
+
+const OrdersIndexLazyRoute = OrdersIndexLazyImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/orders/index.lazy').then((d) => d.Route))
+
 const LoginIndexLazyRoute = LoginIndexLazyImport.update({
-	id: '/login/',
-	path: '/login/',
-	getParentRoute: () => rootRoute,
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/login/index.lazy').then((d) => d.Route))
 
-const CargoIndexCargoRoute = CargoIndexCargoImport.update({
-	id: '/cargo/index/cargo',
-	path: '/cargo/index/cargo',
-	getParentRoute: () => rootRoute,
+const CargoIndexLazyRoute = CargoIndexLazyImport.update({
+  id: '/cargo/',
+  path: '/cargo/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/cargo/index.lazy').then((d) => d.Route))
+
+const AboutIndexRoute = AboutIndexImport.update({
+  id: '/about/',
+  path: '/about/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const OffersIdRoute = OffersIdImport.update({
+  id: '/offers/$id',
+  path: '/offers/$id',
+  getParentRoute: () => rootRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
-	interface FileRoutesByPath {
-		'/': {
-			id: '/'
-			path: '/'
-			fullPath: '/'
-			preLoaderRoute: typeof IndexImport
-			parentRoute: typeof rootRoute
-		}
-		'/login/': {
-			id: '/login/'
-			path: '/login'
-			fullPath: '/login'
-			preLoaderRoute: typeof LoginIndexLazyImport
-			parentRoute: typeof rootRoute
-		}
-		'/cargo/index/cargo': {
-			id: '/cargo/index/cargo'
-			path: '/cargo/index/cargo'
-			fullPath: '/cargo/index/cargo'
-			preLoaderRoute: typeof CargoIndexCargoImport
-			parentRoute: typeof rootRoute
-		}
-	}
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/offers/$id': {
+      id: '/offers/$id'
+      path: '/offers/$id'
+      fullPath: '/offers/$id'
+      preLoaderRoute: typeof OffersIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/about/': {
+      id: '/about/'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/cargo/': {
+      id: '/cargo/'
+      path: '/cargo'
+      fullPath: '/cargo'
+      preLoaderRoute: typeof CargoIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/orders/': {
+      id: '/orders/'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/register/': {
+      id: '/register/'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/responses/': {
+      id: '/responses/'
+      path: '/responses'
+      fullPath: '/responses'
+      preLoaderRoute: typeof ResponsesIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+  }
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-	'/': typeof IndexRoute
-	'/login': typeof LoginIndexLazyRoute
-	'/cargo/index/cargo': typeof CargoIndexCargoRoute
+  '/': typeof IndexRoute
+  '/offers/$id': typeof OffersIdRoute
+  '/about': typeof AboutIndexRoute
+  '/cargo': typeof CargoIndexLazyRoute
+  '/login': typeof LoginIndexLazyRoute
+  '/orders': typeof OrdersIndexLazyRoute
+  '/register': typeof RegisterIndexLazyRoute
+  '/responses': typeof ResponsesIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
-	'/': typeof IndexRoute
-	'/login': typeof LoginIndexLazyRoute
-	'/cargo/index/cargo': typeof CargoIndexCargoRoute
+  '/': typeof IndexRoute
+  '/offers/$id': typeof OffersIdRoute
+  '/about': typeof AboutIndexRoute
+  '/cargo': typeof CargoIndexLazyRoute
+  '/login': typeof LoginIndexLazyRoute
+  '/orders': typeof OrdersIndexLazyRoute
+  '/register': typeof RegisterIndexLazyRoute
+  '/responses': typeof ResponsesIndexLazyRoute
 }
 
 export interface FileRoutesById {
-	__root__: typeof rootRoute
-	'/': typeof IndexRoute
-	'/login/': typeof LoginIndexLazyRoute
-	'/cargo/index/cargo': typeof CargoIndexCargoRoute
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/offers/$id': typeof OffersIdRoute
+  '/about/': typeof AboutIndexRoute
+  '/cargo/': typeof CargoIndexLazyRoute
+  '/login/': typeof LoginIndexLazyRoute
+  '/orders/': typeof OrdersIndexLazyRoute
+  '/register/': typeof RegisterIndexLazyRoute
+  '/responses/': typeof ResponsesIndexLazyRoute
 }
 
 export interface FileRouteTypes {
-	fileRoutesByFullPath: FileRoutesByFullPath
-	fullPaths: '/' | '/login' | '/cargo/index/cargo'
-	fileRoutesByTo: FileRoutesByTo
-	to: '/' | '/login' | '/cargo/index/cargo'
-	id: '__root__' | '/' | '/login/' | '/cargo/index/cargo'
-	fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/offers/$id'
+    | '/about'
+    | '/cargo'
+    | '/login'
+    | '/orders'
+    | '/register'
+    | '/responses'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/offers/$id'
+    | '/about'
+    | '/cargo'
+    | '/login'
+    | '/orders'
+    | '/register'
+    | '/responses'
+  id:
+    | '__root__'
+    | '/'
+    | '/offers/$id'
+    | '/about/'
+    | '/cargo/'
+    | '/login/'
+    | '/orders/'
+    | '/register/'
+    | '/responses/'
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-	IndexRoute: typeof IndexRoute
-	LoginIndexLazyRoute: typeof LoginIndexLazyRoute
-	CargoIndexCargoRoute: typeof CargoIndexCargoRoute
+  IndexRoute: typeof IndexRoute
+  OffersIdRoute: typeof OffersIdRoute
+  AboutIndexRoute: typeof AboutIndexRoute
+  CargoIndexLazyRoute: typeof CargoIndexLazyRoute
+  LoginIndexLazyRoute: typeof LoginIndexLazyRoute
+  OrdersIndexLazyRoute: typeof OrdersIndexLazyRoute
+  RegisterIndexLazyRoute: typeof RegisterIndexLazyRoute
+  ResponsesIndexLazyRoute: typeof ResponsesIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-	IndexRoute: IndexRoute,
-	LoginIndexLazyRoute: LoginIndexLazyRoute,
-	CargoIndexCargoRoute: CargoIndexCargoRoute,
+  IndexRoute: IndexRoute,
+  OffersIdRoute: OffersIdRoute,
+  AboutIndexRoute: AboutIndexRoute,
+  CargoIndexLazyRoute: CargoIndexLazyRoute,
+  LoginIndexLazyRoute: LoginIndexLazyRoute,
+  OrdersIndexLazyRoute: OrdersIndexLazyRoute,
+  RegisterIndexLazyRoute: RegisterIndexLazyRoute,
+  ResponsesIndexLazyRoute: ResponsesIndexLazyRoute,
 }
 
-export const routeTree = rootRoute._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRoute
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -119,18 +245,38 @@ export const routeTree = rootRoute._addFileChildren(rootRouteChildren)._addFileT
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/offers/$id",
+        "/about/",
+        "/cargo/",
         "/login/",
-        "/cargo/index/cargo"
+        "/orders/",
+        "/register/",
+        "/responses/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
+    "/offers/$id": {
+      "filePath": "offers/$id.tsx"
+    },
+    "/about/": {
+      "filePath": "about/index.tsx"
+    },
+    "/cargo/": {
+      "filePath": "cargo/index.lazy.tsx"
+    },
     "/login/": {
       "filePath": "login/index.lazy.tsx"
     },
-    "/cargo/index/cargo": {
-      "filePath": "cargo/index.cargo.tsx"
+    "/orders/": {
+      "filePath": "orders/index.lazy.tsx"
+    },
+    "/register/": {
+      "filePath": "register/index.lazy.tsx"
+    },
+    "/responses/": {
+      "filePath": "responses/index.lazy.tsx"
     }
   }
 }
