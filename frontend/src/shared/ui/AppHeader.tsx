@@ -5,7 +5,7 @@ import { useNavigate } from '@tanstack/react-router'
 
 type AppLayoutProps = {
 	title: string
-	showGoBack: boolean
+	showGoBack?: boolean
 }
 
 const { Title } = Typography
@@ -20,7 +20,7 @@ export const AppHeader: React.FC<AppLayoutProps> = ({ title, showGoBack }) => {
 	return (
 		<Space align="center" size="middle">
 			{showGoBack && (
-				<Button type="text" icon={<ArrowLeftOutlined />} onClick={handleGoBack} style={{ fontSize: '16px' }}>
+				<Button type="text" icon={<ArrowLeftOutlined />} onClick={handleGoBack} className="text-[16px]">
 					Назад
 				</Button>
 			)}

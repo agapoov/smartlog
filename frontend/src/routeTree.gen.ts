@@ -19,6 +19,7 @@ import { Route as OffersIdImport } from './routes/offers/$id'
 
 // Create Virtual Routes
 
+const ResponsesIndexLazyImport = createFileRoute('/responses/')()
 const RegisterIndexLazyImport = createFileRoute('/register/')()
 const OrdersIndexLazyImport = createFileRoute('/orders/')()
 const LoginIndexLazyImport = createFileRoute('/login/')()
@@ -31,6 +32,14 @@ const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
+
+const ResponsesIndexLazyRoute = ResponsesIndexLazyImport.update({
+  id: '/responses/',
+  path: '/responses/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/responses/index.lazy').then((d) => d.Route),
+)
 
 const RegisterIndexLazyRoute = RegisterIndexLazyImport.update({
   id: '/register/',
@@ -123,6 +132,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterIndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/responses/': {
+      id: '/responses/'
+      path: '/responses'
+      fullPath: '/responses'
+      preLoaderRoute: typeof ResponsesIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -136,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginIndexLazyRoute
   '/orders': typeof OrdersIndexLazyRoute
   '/register': typeof RegisterIndexLazyRoute
+  '/responses': typeof ResponsesIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
@@ -146,6 +163,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexLazyRoute
   '/orders': typeof OrdersIndexLazyRoute
   '/register': typeof RegisterIndexLazyRoute
+  '/responses': typeof ResponsesIndexLazyRoute
 }
 
 export interface FileRoutesById {
@@ -157,6 +175,7 @@ export interface FileRoutesById {
   '/login/': typeof LoginIndexLazyRoute
   '/orders/': typeof OrdersIndexLazyRoute
   '/register/': typeof RegisterIndexLazyRoute
+  '/responses/': typeof ResponsesIndexLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -169,6 +188,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/orders'
     | '/register'
+    | '/responses'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -178,6 +198,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/orders'
     | '/register'
+    | '/responses'
   id:
     | '__root__'
     | '/'
@@ -187,6 +208,7 @@ export interface FileRouteTypes {
     | '/login/'
     | '/orders/'
     | '/register/'
+    | '/responses/'
   fileRoutesById: FileRoutesById
 }
 
@@ -198,6 +220,7 @@ export interface RootRouteChildren {
   LoginIndexLazyRoute: typeof LoginIndexLazyRoute
   OrdersIndexLazyRoute: typeof OrdersIndexLazyRoute
   RegisterIndexLazyRoute: typeof RegisterIndexLazyRoute
+  ResponsesIndexLazyRoute: typeof ResponsesIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -208,6 +231,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginIndexLazyRoute: LoginIndexLazyRoute,
   OrdersIndexLazyRoute: OrdersIndexLazyRoute,
   RegisterIndexLazyRoute: RegisterIndexLazyRoute,
+  ResponsesIndexLazyRoute: ResponsesIndexLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -226,7 +250,8 @@ export const routeTree = rootRoute
         "/cargo/",
         "/login/",
         "/orders/",
-        "/register/"
+        "/register/",
+        "/responses/"
       ]
     },
     "/": {
@@ -249,6 +274,9 @@ export const routeTree = rootRoute
     },
     "/register/": {
       "filePath": "register/index.lazy.tsx"
+    },
+    "/responses/": {
+      "filePath": "responses/index.lazy.tsx"
     }
   }
 }

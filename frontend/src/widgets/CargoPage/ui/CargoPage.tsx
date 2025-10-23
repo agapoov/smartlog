@@ -2,8 +2,16 @@ import { useMemo, useState } from 'react'
 import { AppLayout, Button, Card, Form, Input, Modal, Select, Space, Table } from '@/shared/ui'
 import { useCargoList, useCreateCargo, CargoType, type CreateCargoRequest, type Cargo } from '@/shared/api'
 import { AppHeader } from '@/shared/ui/AppHeader'
+import { getCargoTypeDisplay } from '@/shared/utils/cargoType.utils'
+import { Tag } from 'antd'
 
-const cargoTypeOptions = Object.values(CargoType).map((value) => ({ label: value, value }))
+const cargoTypeOptions = Object.values(CargoType).map((value) => {
+	const { label, tagColor } = getCargoTypeDisplay(value)
+	return {
+		label: <Tag color={tagColor}>{label}</Tag>,
+		value,
+	}
+})
 
 export const CargoPage = () => {
 	const { data, isLoading } = useCargoList()
@@ -11,10 +19,15 @@ export const CargoPage = () => {
 	const [open, setOpen] = useState(false)
 	const [form] = Form.useForm<CreateCargoRequest>()
 
+	const renderCargoType = (value: CargoType) => {
+		const { label, tagColor } = getCargoTypeDisplay(value)
+		return <Tag color={tagColor}>{label}</Tag>
+	}
+
 	const columns = useMemo(
 		() => [
 			{ title: 'Имя', dataIndex: 'name', key: 'name' },
-			{ title: 'Тип', dataIndex: 'cargo_type', key: 'cargo_type' },
+			{ title: 'Тип', dataIndex: 'cargo_type', key: 'cargo_type', render: renderCargoType },
 			{ title: 'Вес, кг', dataIndex: 'cargo_weight', key: 'cargo_weight' },
 			{ title: 'Объём, м³', dataIndex: 'cargo_volume', key: 'cargo_volume' },
 		],
@@ -72,10 +85,10 @@ export const CargoPage = () => {
 						<Select options={cargoTypeOptions} placeholder="Выберите тип" />
 					</Form.Item>
 					<Form.Item label="Вес, кг" name="cargo_weight" rules={[{ required: true, message: 'Укажите вес' }]}>
-						<Input type="number" min={0} />
+						<Input type="number" min={0} placeholder="Например: 18" />
 					</Form.Item>
 					<Form.Item label="Объём, м³" name="cargo_volume" rules={[{ required: true, message: 'Укажите объём' }]}>
-						<Input type="number" min={0} />
+						<Input type="number" min={0} placeholder="Например: 11.7" />
 					</Form.Item>
 				</Form>
 			</Modal>

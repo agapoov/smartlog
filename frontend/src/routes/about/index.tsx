@@ -1,20 +1,30 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { AppLayout } from '@/shared/ui'
-import { Card, Typography, Space } from 'antd'
+import { Card, Typography, Space, Button } from 'antd'
+import { ArrowLeftOutlined } from '@ant-design/icons'
+import { AppHeader } from '@/shared/ui/AppHeader'
 
-const { Title, Paragraph } = Typography
+const { Paragraph } = Typography
 
 export const Route = createFileRoute('/about/')({
 	component: AboutPage,
 })
 
 function AboutPage() {
+	const navigate = useNavigate()
+
+	const handleGoBack = () => {
+		navigate({ to: '/' })
+	}
 	return (
 		<AppLayout>
 			<div className="max-w-4xl mx-auto pt-8">
+				<Button type="text" icon={<ArrowLeftOutlined />} onClick={handleGoBack} className="text-[16px] mb-3">
+					Назад
+				</Button>
 				<Card className="shadow-lg rounded-2xl border-0">
 					<Space direction="vertical" size="large" className="w-full">
-						<Title level={1}>О нас</Title>
+						<AppHeader title="О нас" />
 						<Paragraph>
 							Добро пожаловать в нашу систему управления заказами. Мы предоставляем современные решения для эффективного
 							управления грузоперевозками.
