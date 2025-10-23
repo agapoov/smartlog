@@ -114,8 +114,8 @@ def respond_to_offer(request):
         if not order_id:
             raise BadRequestException("Не передан order_id")
         
-        if TransportOffer.objects.filter(
-            Q(id=offer_id) & Q(order_id=order_id)
+        if TransportResponse.objects.filter(
+            Q(offer_id=offer_id) & Q(order_id=order_id)
         ).exists():
             raise BadRequestException("Отклик уже отправлен")
         
