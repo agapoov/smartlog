@@ -70,6 +70,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     "orders",
+    "integrations",
+    "ws_chat"
 ]
 
 MIDDLEWARE = [
@@ -239,3 +241,4 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 150 * 1024 * 1024  # 150MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 150 * 1024 * 1024  # 150MB
 
 FNS_API_KEY = "d11a8b0b43a1dcbdd540035c8102231e6dada8e0"
+ATI_SU_API_KEY = 'ec9071f8893d4e7e868f4f79a5d5cc0c'
