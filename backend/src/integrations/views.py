@@ -216,7 +216,6 @@ def get_transport_responses(request):
                 "order_id": response.order.id,
                 "carrier_name": response.offer.carrier_name,
                 "carrier_inn": response.offer.carrier_inn,
-                "offer_price": response.offer.price,
                 "offer_delivery_time": response.offer.delivery_time,
                 "status": response.get_status_display(),
                 "status_code": response.status,
