@@ -6,7 +6,7 @@ from orders.models import Order
 from .atisu import create_order
 from .mock import get_top_offers
 from .models import TransportOffer, TransportResponse
-
+from django.db.models import Q
 
 @api_view(["POST"])
 def send_cargo_and_order_to_ati(request):
@@ -113,6 +113,11 @@ def respond_to_offer(request):
         
         if not order_id:
             raise BadRequestException("Не передан order_id")
+        
+        if TransportOffer.objects.filter(
+            Q(id=offer_id) & Q(order_id=order_id)
+        ).exists():
+            raise BadRequestException("Отклик уже отправлен")
         
         offer = TransportOffer.objects.get(id=offer_id)
         order = Order.objects.get(id=order_id)
@@ -239,53 +244,6 @@ def get_transport_responses(request):
         
     except Exception as exc:
         raise BadRequestException(f"Ошибка получения откликов: {str(exc)}")
-    
-    return Response(response_data, status=status_code)
-
-
-@api_view(["GET"])
-def get_responses_by_order(request, order_id):
-    """Получение всех откликов по конкретному заказу"""
-    response_data = {}
-    status_code = status.HTTP_200_OK
-    
-    try:
-        order = Order.objects.get(id=order_id)
-        responses = TransportResponse.objects.filter(order=order).select_related('offer').order_by('-created_at')
-        
-        response_list = []
-        for response in responses:
-            response_list.append({
-                "response_id": response.id,
-                "offer_id": response.offer.id,
-                "carrier_name": response.offer.carrier_name,
-                "carrier_inn": response.offer.carrier_inn,
-                "offer_price": response.offer.price,
-                "offer_delivery_time": response.offer.delivery_time,
-                "offer_rating": response.offer.carrier_rating,
-                "status": response.get_status_display(),
-                "status_code": response.status,
-                "comment": response.comment,
-                "created_at": response.created_at,
-                "updated_at": response.updated_at
-            })
-        
-        response_data = {
-            "order_id": order.id,
-            "order_info": {
-                "route": f"{order.start_address} → {order.end_address}",
-                "distance": order.distance,
-                "cargo_weight": order.cargo.cargo_weight if order.cargo else None
-            },
-            "responses": response_list,
-            "total_responses": len(response_list)
-        }
-        
-    except Order.DoesNotExist:
-        raise BadRequestException("Заказ с таким ID не найден")
-    
-    except Exception as exc:
-        raise BadRequestException(f"Ошибка получения откликов по заказу: {str(exc)}")
     
     return Response(response_data, status=status_code)
 
