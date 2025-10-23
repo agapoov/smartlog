@@ -4,7 +4,7 @@ import { Card, Typography, Space, Button } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { AppHeader } from '@/shared/ui/AppHeader'
 
-const { Paragraph } = Typography
+const { Paragraph, Title } = Typography
 
 export const Route = createFileRoute('/about/')({
 	component: AboutPage,
@@ -31,6 +31,13 @@ function AboutPage() {
 						</Paragraph>
 						<Paragraph>
 							Наша платформа позволяет легко создавать, отслеживать и управлять заказами в режиме реального времени.
+						</Paragraph>
+						<Title level={4}>Краткое руководство пользователя</Title>
+						<Paragraph>
+							Для создания заказа укажите: начальный и конечный адрес (например, Белгород → Москва), объем груза (м³),
+							вес (тн или кг), расстояние (км) и срок доставки (дни). После создания вы сможете просматривать отклики
+							перевозчиков с данными о перевозчике, ИНН, рейтинге, цене, времени доставки и маршруте. Используйте
+							фильтры для поиска подходящих предложений и кнопку "Откликнуться" для принятия.
 						</Paragraph>
 					</Space>
 				</Card>

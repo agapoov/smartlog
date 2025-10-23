@@ -1,5 +1,5 @@
 import { $authHost } from '@/features/auth'
-import type { FindOffersRequest, Offer, OrderInfo, RespondOfferRequest } from '../model/types'
+import type { FindOffersRequest, Offer, OrderInfo, RespondOfferRequest, ResponsesApiResponse } from '../model/types'
 
 export const offersApi = {
 	async findOffers(payload: FindOffersRequest) {
@@ -14,6 +14,6 @@ export const offersApi = {
 	},
 
 	async getResponses(params: { order_id?: number; status?: string }) {
-		return $authHost.get<{ data: Response[] }>('api/integrations/transport/responses/', { params })
+		return $authHost.get<ResponsesApiResponse>('api/integrations/transport/responses/', { params })
 	},
 }
