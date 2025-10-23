@@ -1,9 +1,16 @@
 import { authStore } from '@/features/auth'
 import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router'
 import { Button, Card, Typography, Space } from 'antd'
-import { LogoutOutlined, OrderedListOutlined, TruckOutlined, UserOutlined } from '@ant-design/icons'
+import {
+	DollarCircleOutlined,
+	LogoutOutlined,
+	OrderedListOutlined,
+	TruckOutlined,
+	UserOutlined,
+} from '@ant-design/icons'
 import { tokenService } from '@/shared/lib'
 import { AppLayout } from '@/shared/ui'
+import { BulbFilled } from '@ant-design/icons' // Replaced with BulbFilled
 
 const { Title, Text } = Typography
 
@@ -44,14 +51,16 @@ function RouteComponent() {
 										Добро пожаловать в систему
 									</Title>
 									<Text type="secondary">Вы успешно авторизованы</Text>
-									<Link to="/about">
-										<Button type="link">О нас</Button>
-									</Link>
 								</div>
 							</div>
-							<Button type="default" icon={<LogoutOutlined />} onClick={handleLogout} className="rounded-lg">
-								Выйти
-							</Button>
+							<div className="flex gap-5">
+								<Link to="/about">
+									<Button icon={<BulbFilled />}>О нас</Button>
+								</Link>
+								<Button type="default" icon={<LogoutOutlined />} onClick={handleLogout} className="rounded-lg">
+									Выйти
+								</Button>
+							</div>
 						</div>
 						<Card onClick={() => handleNavigateTo('/cargo')} hoverable>
 							<div className="flex flex-row gap-5 items-start">
@@ -66,6 +75,15 @@ function RouteComponent() {
 								<OrderedListOutlined className="text-3xl" />
 								<Title level={4}>Заказы</Title>
 								<Text type="secondary">Перейти в отображение и создание заказов</Text>
+							</div>
+						</Card>
+						<Card onClick={() => handleNavigateTo('/responses')} hoverable>
+							<div className="flex flex-row gap-5 items-start">
+								<DollarCircleOutlined className="text-3xl" />
+								<Title level={4}>Отклики</Title>
+								<Text type="secondary" className="mt-1">
+									Перейти в отображение откликов
+								</Text>
 							</div>
 						</Card>
 					</Space>

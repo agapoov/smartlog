@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts'
 import type { Offer } from '@/features/offers'
 
 interface OfferPriceBarChartProps {
@@ -15,7 +15,7 @@ export const OfferPriceBarChart = ({ offers }: OfferPriceBarChartProps) => {
 	const data = offers.map((offer, index) => ({
 		name: offer.carrier_name || `Оффер ${offer.id}`,
 		price: offer.price,
-		fill: COLORS[index % COLORS.length], // Добавляем цвет для каждого оффера
+		fill: COLORS[index % COLORS.length],
 	}))
 
 	return (
@@ -23,8 +23,8 @@ export const OfferPriceBarChart = ({ offers }: OfferPriceBarChartProps) => {
 			<XAxis dataKey="name" angle={-10} textAnchor="end" interval={0} height={60} />
 			<YAxis />
 			<Tooltip formatter={(value: number) => `${value.toFixed(2)} ₽`} />
-			<Legend />
-			<Bar dataKey="price" fill="#8884d8" /> {/* Базовый цвет, переопределяется через данные */}
+
+			<Bar dataKey="price" fill="#8884d8" />
 		</BarChart>
 	)
 }

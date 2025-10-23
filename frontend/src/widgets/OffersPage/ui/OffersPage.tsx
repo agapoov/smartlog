@@ -3,11 +3,12 @@ import { useParams } from '@tanstack/react-router'
 import { AppLayout, Button, Card, Space, Table } from '@/shared/ui'
 import { AppHeader } from '@/shared/ui/AppHeader'
 import { useFindOffers, useRespondOffer, type Offer } from '@/features/offers'
-import { Descriptions, Segmented } from 'antd'
+import { Descriptions, Segmented, Tooltip } from 'antd'
 import { useOrdersById } from '@/features/orders/hooks/orders.hooks'
 import { OfferCoefficientPieChart } from './OfferCoefficientPieChart'
 import { OfferPriceBarChart } from './OfferPriceBarChart'
-import useToastStatus from '@/shared/utils/useToastStatus'
+import useToastStatus from '@/shared/utils/useToastStatus.utils'
+import { HideableTooltip } from './HideableTooltip'
 
 export const OffersPage = () => {
 	const { id: orderId } = useParams({ from: '/offers/$id' })
@@ -15,7 +16,9 @@ export const OffersPage = () => {
 	const { data: orderItem } = useOrdersById(Number(orderId))
 	const { mutate: respondOffer, isPending: isResponding, status, error } = useRespondOffer()
 	const [activeTab, setActiveTab] = useState('Таблица')
+
 	useToastStatus({ status, errorMsg: error })
+
 	const columns = useMemo(
 		() => [
 			{ title: 'ID', dataIndex: 'id', key: 'id' },
@@ -25,19 +28,49 @@ export const OffersPage = () => {
 				title: 'Рейтинг',
 				dataIndex: 'carrier_rating',
 				key: 'carrier_rating',
-				render: (value: number) => (value ? value.toFixed(1) : '-'),
+				render: (value: number, record: Offer) => (
+					<Tooltip title={record.coefficient_breakdown.explanation.rating || 'Нет пояснения'}>
+						{value ? value.toFixed(1) : '-'}
+					</Tooltip>
+				),
 			},
 			{
-				title: 'Цена, ₽',
+				title: 'Цена',
 				dataIndex: 'price',
 				key: 'price',
-				render: (value: number) => (value ? value.toFixed(2) : '-'),
+				render: (value: number, record: Offer) => (
+					<Tooltip title={record.coefficient_breakdown.explanation.price || 'Нет пояснения'}>
+						{value ? <span className="whitespace-nowrap">{Math.round(value).toLocaleString('ru-RU')} ₽</span> : '-'}
+					</Tooltip>
+				),
 			},
 			{
-				title: 'Время доставки, ч',
+				title: 'Время доставки',
 				dataIndex: 'delivery_time',
 				key: 'delivery_time',
-				render: (value: number) => (value ? value.toFixed(1) : '-'),
+				render: (value: number, record: Offer) => (
+					<Tooltip title={record.coefficient_breakdown.explanation.time || 'Нет пояснения'}>
+						{value ? (
+							<span className="whitespace-nowrap">
+								{Math.floor(value) === value
+									? `${Math.floor(value)}ч`
+									: `${Math.floor(value)} ч ${Math.round((value % 1) * 60)} мин`}
+							</span>
+						) : (
+							'-'
+						)}
+					</Tooltip>
+				),
+			},
+			{
+				title: 'Надежность',
+				dataIndex: 'reliability_score',
+				key: 'reliability_score',
+				render: (value: number, record: Offer) => (
+					<Tooltip title={record.coefficient_breakdown.explanation.reliability || 'Нет пояснения'}>
+						{value ? value.toFixed(1) : '-'}
+					</Tooltip>
+				),
 			},
 			{
 				title: 'Коэффициент',
@@ -66,6 +99,7 @@ export const OffersPage = () => {
 	return (
 		<AppLayout>
 			<div className="max-w-5xl mx-auto pt-8">
+				<HideableTooltip text="Наведитесь на значение столбцов, чтобы получить их объяснение." />
 				<Space direction="vertical" size="large" className="w-full">
 					<AppHeader
 						showGoBack
@@ -99,6 +133,7 @@ export const OffersPage = () => {
 								rowKey={(r: Offer) => r.id}
 								loading={isOffersLoading}
 								columns={columns}
+								scroll={{ x: 'maxContent' }}
 								dataSource={offersData?.offers}
 								pagination={false}
 							/>
