@@ -224,17 +224,17 @@ def send_message(request, chat_id):
                 file_type=file.content_type,
                 uploaded_by=request.user
             )
-            
-            participants = ChatParticipant.objects.filter(chat=chat).exclude(user=request.user)
-            for participant in participants:
-                ChatNotification.objects.create(
-                    user=participant.user,
-                    chat=chat,
-                    message=message
-                )
-            
-            response_serializer = MessageSerializer(message)
-            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        
+        participants = ChatParticipant.objects.filter(chat=chat).exclude(user=request.user)
+        for participant in participants:
+            ChatNotification.objects.create(
+                user=participant.user,
+                chat=chat,
+                message=message
+            )
+        
+        response_serializer = MessageSerializer(message)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
             
     except BadRequestException as exc:
         return Response({"details": exc.response}, status=exc.status)
