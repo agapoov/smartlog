@@ -32,7 +32,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
         await self.accept()
         
-        await self.send_chat_history()
+        # отдаём по https историю чата
+        # await self.send_chat_history()
     
     async def disconnect(self, close_code):
         """Отключение от WebSocket"""
