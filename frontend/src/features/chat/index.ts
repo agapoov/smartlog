@@ -13,3 +13,18 @@ export type {
 } from './model/types'
 
 export { chatApi } from './api/chat-api'
+
+export {
+	useGetAllChats,
+	useGetChatById,
+	useGetChatMessages,
+	useGetNotifications,
+	useCreateChat,
+	useSendMessage,
+	useAddMember,
+	useUpdateChat,
+	useRemoveMember,
+	useDeleteChat,
+	useReadNotification,
+	useReadAllNotifications,
+} from './hooks/chat.hooks'

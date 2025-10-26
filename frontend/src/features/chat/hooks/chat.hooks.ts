@@ -35,11 +35,11 @@ export const useGetChatById = (id: string | number) =>
 		},
 	})
 
-export const useGetChatMessages = (chatId: string | number, params?: IGetChatMessagesParams) =>
+export const useGetChatMessages = (chatId: string, params?: IGetChatMessagesParams) =>
 	useQuery({
 		queryKey: [QUERY_GET_CHAT_MESSAGES, chatId, params],
 		queryFn: async () => {
-			const res = await chatApi.getChatMessages(Number(chatId), params || {})
+			const res = await chatApi.getChatMessages(chatId, params || {})
 			return res.data
 		},
 	})
@@ -63,10 +63,10 @@ export const useCreateChat = () => {
 	})
 }
 
-export const useSendMessage = (chatId: string | number) => {
+export const useSendMessage = (chatId: string) => {
 	const queryClient = useQueryClient()
 	return useMutation<IMessage, Error, IDtoSendMessage>({
-		mutationFn: (data) => chatApi.sendMessage(Number(chatId), data).then((res) => res.data),
+		mutationFn: (data) => chatApi.sendMessage(chatId, data).then((res) => res.data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: [QUERY_GET_CHAT_MESSAGES, chatId] })
 			queryClient.invalidateQueries({ queryKey: [QUERY_GET_ALL_CHATS] })

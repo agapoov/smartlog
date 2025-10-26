@@ -14,7 +14,7 @@ export const OutcomeMessage: FC<IProps> = ({ message }) => {
 	return (
 		<div className="flex justify-end gap-2 px-4 ">
 			<Button type="text" size="small" icon={<MoreOutlined />} />
-			<div className=" flex bg-gray-100 rounded-lg flex-col">
+			<div className=" flex bg-gray-50 rounded-lg flex-col">
 				{message.reply_to && (
 					<div className="relative bg-gray-300 m-2 rounded-xl rounded-l-none p-2 text-sm">
 						<div className="absolute left-0 top-0 bottom-0 w-1 bg-gray-400 rounded-l-lg" />

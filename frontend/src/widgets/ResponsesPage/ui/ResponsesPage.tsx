@@ -6,7 +6,7 @@ import { useResponsesList } from '@/features/offers'
 import { Select } from '@/shared/ui'
 import type { Order } from '@/features/orders'
 
-const orderOptions = (ordersData: { data: Order | Order[] } | undefined) =>
+export const orderOptions = (ordersData: { data: Order | Order[] } | undefined) =>
 	ordersData
 		? Array.isArray(ordersData.data)
 			? ordersData.data.map((order) => ({
