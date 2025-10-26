@@ -52,7 +52,7 @@ $authHost.interceptors.response.use(
 				return Promise.reject(error)
 			}
 
-			const response = await $host.post('api/login/refresh/', {
+			const response = await $host.post('api/token/refresh/', {
 				refresh: refreshToken,
 			})
 

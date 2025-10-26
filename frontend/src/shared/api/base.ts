@@ -74,7 +74,7 @@ $auth.interceptors.response.use(
 				// Проверяем, нужен ли refresh
 				if (tokenService.needsRefresh()) {
 					// Обновляем токен
-					const response = await $host.post('api/login/refresh/', {
+					const response = await $host.post('api/token/refresh/', {
 						refresh: tokenService.refresh,
 					})
 
