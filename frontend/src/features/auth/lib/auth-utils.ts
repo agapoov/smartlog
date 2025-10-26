@@ -1,3 +1,4 @@
+import type { IUser } from '@/features/chat/model/types'
 import { tokenService } from '@/shared/lib/token-service'
 
 export const authUtils = {
@@ -9,6 +10,10 @@ export const authUtils = {
 	// Получение токена доступа
 	getAccessToken(): string {
 		return tokenService.access
+	},
+
+	getUser(): IUser | null {
+		return tokenService.user
 	},
 
 	// Проверка истек ли токен (базовая проверка)

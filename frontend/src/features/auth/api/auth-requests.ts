@@ -14,50 +14,44 @@ export interface RegisterRequest {
 
 export const authApi = {
 	async register(credentials: RegisterRequest): Promise<TokenResponse> {
-		const response = await $host.post('api/register/', credentials)
-		const validatedData = TokenResponseSchema.parse(response.data)
+		const { data } = await $host.post('api/register/', credentials)
+		const validated = TokenResponseSchema.parse(data)
 
-		tokenService.setAccess(validatedData.access)
-		tokenService.setRefresh(validatedData.refresh)
+		tokenService.setAccess(validated.access)
+		tokenService.setRefresh(validated.refresh)
+		tokenService.setUser(validated.user)
 
 		authStore.isAuthenticated = true
-
-		return validatedData
+		return validated
 	},
 
 	async login(credentials: LoginRequest): Promise<TokenResponse> {
-		const response = await $host.post('api/login/', credentials)
-		const validatedData = TokenResponseSchema.parse(response.data)
+		const { data } = await $host.post('api/login/', credentials)
+		const validated = TokenResponseSchema.parse(data)
 
-		tokenService.setAccess(validatedData.access)
-		tokenService.setRefresh(validatedData.refresh)
+		tokenService.setAccess(validated.access)
+		tokenService.setRefresh(validated.refresh)
+		tokenService.setUser(validated.user)
 
 		authStore.isAuthenticated = true
-
-		return validatedData
+		return validated
 	},
 
 	async refreshToken(): Promise<string> {
-		const refreshToken = tokenService.refresh
-		if (!refreshToken) {
-			throw new Error('Refresh token отсутствует')
-		}
+		const refresh = tokenService.refresh
+		if (!refresh) throw new Error('Refresh token missing')
 
-		const response = await $host.post('api/login/refresh/', {
-			refresh: refreshToken,
-		})
+		const { data } = await $host.post('api/token/refresh/', { refresh })
+		const validated = RefreshResponseSchema.parse(data)
 
-		const validatedData = RefreshResponseSchema.parse(response.data)
-		tokenService.setAccess(validatedData.access)
+		tokenService.setAccess(validated.access)
 		authStore.isAuthenticated = true
-
-		return validatedData.access
+		return validated.access
 	},
 
 	async logout(): Promise<void> {
 		tokenService.clear()
 		authStore.isAuthenticated = false
-
 		window.location.href = '/login'
 	},
 }
