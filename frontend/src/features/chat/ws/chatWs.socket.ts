@@ -36,7 +36,7 @@ export type WSOutgoing =
 /* ------------------------------------------------------------------ */
 import { useEffect, useRef, useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { QUERY_GET_CHAT_MESSAGES, QUERY_GET_ALL_CHATS } from '../consts/queryKeys'
+import { QUERY_GET_CHAT_MESSAGES } from '../consts/queryKeys'
 
 type UseChatWebSocketParams = {
 	chatId: string | number

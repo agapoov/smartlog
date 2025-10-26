@@ -9,8 +9,6 @@ import { MessageInput } from '../ui/MessageInput'
 import useToastStatus from '@/shared/utils/useToastStatus.utils'
 import { useChatWebSocket } from '@/features/chat/ws/chatWs.socket'
 import { authUtils } from '@/features/auth'
-import { useQueryClient } from '@tanstack/react-query'
-import { QUERY_GET_ALL_CHATS } from '@/features/chat/consts/queryKeys'
 
 interface IProps {
 	selectedChat: IChat | null
