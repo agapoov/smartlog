@@ -23,6 +23,7 @@ const ResponsesIndexLazyImport = createFileRoute('/responses/')()
 const RegisterIndexLazyImport = createFileRoute('/register/')()
 const OrdersIndexLazyImport = createFileRoute('/orders/')()
 const LoginIndexLazyImport = createFileRoute('/login/')()
+const ChatIndexLazyImport = createFileRoute('/chat/')()
 const CargoIndexLazyImport = createFileRoute('/cargo/')()
 
 // Create/Update Routes
@@ -60,6 +61,12 @@ const LoginIndexLazyRoute = LoginIndexLazyImport.update({
   path: '/login/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/login/index.lazy').then((d) => d.Route))
+
+const ChatIndexLazyRoute = ChatIndexLazyImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/chat/index.lazy').then((d) => d.Route))
 
 const CargoIndexLazyRoute = CargoIndexLazyImport.update({
   id: '/cargo/',
@@ -111,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CargoIndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/chat/': {
+      id: '/chat/'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -149,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/offers/$id': typeof OffersIdRoute
   '/about': typeof AboutIndexRoute
   '/cargo': typeof CargoIndexLazyRoute
+  '/chat': typeof ChatIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
   '/orders': typeof OrdersIndexLazyRoute
   '/register': typeof RegisterIndexLazyRoute
@@ -160,6 +175,7 @@ export interface FileRoutesByTo {
   '/offers/$id': typeof OffersIdRoute
   '/about': typeof AboutIndexRoute
   '/cargo': typeof CargoIndexLazyRoute
+  '/chat': typeof ChatIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
   '/orders': typeof OrdersIndexLazyRoute
   '/register': typeof RegisterIndexLazyRoute
@@ -172,6 +188,7 @@ export interface FileRoutesById {
   '/offers/$id': typeof OffersIdRoute
   '/about/': typeof AboutIndexRoute
   '/cargo/': typeof CargoIndexLazyRoute
+  '/chat/': typeof ChatIndexLazyRoute
   '/login/': typeof LoginIndexLazyRoute
   '/orders/': typeof OrdersIndexLazyRoute
   '/register/': typeof RegisterIndexLazyRoute
@@ -185,6 +202,7 @@ export interface FileRouteTypes {
     | '/offers/$id'
     | '/about'
     | '/cargo'
+    | '/chat'
     | '/login'
     | '/orders'
     | '/register'
@@ -195,6 +213,7 @@ export interface FileRouteTypes {
     | '/offers/$id'
     | '/about'
     | '/cargo'
+    | '/chat'
     | '/login'
     | '/orders'
     | '/register'
@@ -205,6 +224,7 @@ export interface FileRouteTypes {
     | '/offers/$id'
     | '/about/'
     | '/cargo/'
+    | '/chat/'
     | '/login/'
     | '/orders/'
     | '/register/'
@@ -217,6 +237,7 @@ export interface RootRouteChildren {
   OffersIdRoute: typeof OffersIdRoute
   AboutIndexRoute: typeof AboutIndexRoute
   CargoIndexLazyRoute: typeof CargoIndexLazyRoute
+  ChatIndexLazyRoute: typeof ChatIndexLazyRoute
   LoginIndexLazyRoute: typeof LoginIndexLazyRoute
   OrdersIndexLazyRoute: typeof OrdersIndexLazyRoute
   RegisterIndexLazyRoute: typeof RegisterIndexLazyRoute
@@ -228,6 +249,7 @@ const rootRouteChildren: RootRouteChildren = {
   OffersIdRoute: OffersIdRoute,
   AboutIndexRoute: AboutIndexRoute,
   CargoIndexLazyRoute: CargoIndexLazyRoute,
+  ChatIndexLazyRoute: ChatIndexLazyRoute,
   LoginIndexLazyRoute: LoginIndexLazyRoute,
   OrdersIndexLazyRoute: OrdersIndexLazyRoute,
   RegisterIndexLazyRoute: RegisterIndexLazyRoute,
@@ -248,6 +270,7 @@ export const routeTree = rootRoute
         "/offers/$id",
         "/about/",
         "/cargo/",
+        "/chat/",
         "/login/",
         "/orders/",
         "/register/",
@@ -265,6 +288,9 @@ export const routeTree = rootRoute
     },
     "/cargo/": {
       "filePath": "cargo/index.lazy.tsx"
+    },
+    "/chat/": {
+      "filePath": "chat/index.lazy.tsx"
     },
     "/login/": {
       "filePath": "login/index.lazy.tsx"
