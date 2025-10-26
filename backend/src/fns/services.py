@@ -45,5 +45,5 @@ class FNSService:
         # Базовый парсинг ответа, можно адаптировать под ваши нужды
         item = data['items'][0]
 
-        rezult = [{"pros": info.get("Позитив", {}), "cons": info.get("Негатив", {})} for type_org, info in item.items()]
-        return rezult
+        result = [{"Позитив": info.get("Позитив", {}), "Негатив": info.get("Негатив", {})} for type_org, info in item.items()]
+        return result[0]
