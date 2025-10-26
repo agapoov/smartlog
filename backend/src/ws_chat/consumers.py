@@ -191,17 +191,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
             pass
     
     @database_sync_to_async
-    def send_chat_history(self):
-        """Отправка истории сообщений"""
+    def get_chat_history(self):
+        """Получение истории сообщений"""
         try:
             chat = Chat.objects.get(id=self.chat_id)
-            messages = chat.messages.select_related('sender').prefetch_related('files')[:50]
+            messages = chat.messages.select_related('sender').prefetch_related('files').order_by('-created_at')[:50]
             
+            serialized_messages = []
             for message in messages:
                 serializer = MessageSerializer(message)
-                self.send(text_data=json.dumps({
+                serialized_messages.append({
                     'type': 'chat_message',
                     'message': serializer.data
-                }))
+                })
+            
+            return serialized_messages
         except Chat.DoesNotExist:
-            pass
+            return []
+    
+    async def send_chat_history(self):
+        """Отправка истории сообщений"""
+        messages = await self.get_chat_history()
+        
+        for message_data in messages:
+            await self.send(text_data=json.dumps(message_data))
