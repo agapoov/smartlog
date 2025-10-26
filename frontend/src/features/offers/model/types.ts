@@ -45,3 +45,41 @@ export interface RespondOfferRequest {
 	order_id: number
 	offer_id: number
 }
+
+export interface CargoWeight {
+	source: string
+	parsedValue: number
+}
+
+export interface OrderInfo {
+	route: string
+	distance: number
+	cargo_weight: number
+}
+
+export interface Response {
+	response_id: number
+	offer_id: number
+	order_id: number
+	carrier_name: string
+	carrier_inn: string
+	offer_delivery_time: number
+	status: 'pending' | 'accepted' | 'rejected' | 'completed'
+	status_code: string
+	comment: string | null
+	created_at: string
+	updated_at: string
+	order_info: OrderInfo
+}
+
+export interface ResponsesApiResponse {
+	responses: { [key: string]: Response }[]
+	total_count: number
+	filtered_count: number
+	filters: {
+		order_id: string
+		status: string | null
+		limit: number
+		offset: number
+	}
+}

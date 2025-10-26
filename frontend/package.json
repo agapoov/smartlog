@@ -21,6 +21,7 @@
     "@uidotdev/usehooks": "^2.4.1",
     "antd": "^5.25.4",
     "axios": "^1.9.0",
+    "classnames": "^2.5.1",
     "dayjs": "^1.11.18",
     "framer-motion": "^12.16.0",
     "lucide-react": "^0.513.0",

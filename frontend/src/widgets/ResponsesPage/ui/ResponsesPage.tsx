@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { AppLayout, Card, Space } from '@/shared/ui'
+import { AppLayout, Card, Space, Table } from '@/shared/ui'
 import { AppHeader } from '@/shared/ui/AppHeader'
 import { useOrdersList } from '@/features/orders/hooks/orders.hooks'
-// import { useResponsesList } from '@/features/offers'
+import { useResponsesList } from '@/features/offers'
 import { Select } from '@/shared/ui'
 import type { Order } from '@/features/orders'
 
@@ -32,10 +32,73 @@ export const ResponsesPage = () => {
 	const { data: ordersData, isLoading: isOrdersLoading } = useOrdersList()
 	const [selectedOrderId, setSelectedOrderId] = useState<number | undefined>(1)
 	const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined)
-	// const { data: responsesData, isLoading: isResponsesLoading } = useResponsesList({
-	// 	order_id: selectedOrderId,
-	// 	status: selectedStatus,
-	// })
+	const { data: responsesData, isLoading: isResponsesLoading } = useResponsesList({
+		order_id: selectedOrderId,
+		status: selectedStatus,
+	})
+
+	const columns = [
+		{
+			title: 'Перевозчик',
+			dataIndex: 'carrier_name',
+			key: 'carrier_name',
+		},
+		{
+			title: 'ИНН',
+			dataIndex: 'carrier_inn',
+			key: 'carrier_inn',
+		},
+		{
+			title: 'Время доставки',
+			dataIndex: 'offer_delivery_time',
+			key: 'offer_delivery_time',
+			render: (value: number) => (
+				<>
+					{value ? (
+						<span className="whitespace-nowrap">
+							{Math.floor(value) === value
+								? `${Math.floor(value)}ч`
+								: `${Math.floor(value)} ч ${Math.round((value % 1) * 60)} мин`}
+						</span>
+					) : (
+						'-'
+					)}
+				</>
+			),
+		},
+		{
+			title: 'Статус',
+			dataIndex: 'status',
+			key: 'status',
+		},
+		{
+			title: 'Маршрут',
+			dataIndex: ['order_info', 'route'],
+			key: 'route',
+		},
+		{
+			title: 'Расстояние (км)',
+			dataIndex: ['order_info', 'distance'],
+			key: 'distance',
+		},
+		{
+			title: 'Вес груза (кг)',
+			dataIndex: ['order_info', 'cargo_weight'],
+			key: 'cargo_weight',
+		},
+		{
+			title: 'Создано',
+			dataIndex: 'created_at',
+			key: 'created_at',
+			render: (text: string) => new Date(text).toLocaleString('ru-RU'),
+		},
+	]
+
+	const tableData = responsesData?.responses || []
+	const currentPage =
+		responsesData?.filters.offset && responsesData?.filters.limit
+			? Math.floor(responsesData.filters.offset / responsesData.filters.limit) + 1
+			: 1
 
 	return (
 		<AppLayout>
@@ -65,7 +128,17 @@ export const ResponsesPage = () => {
 							</div>
 						}
 					>
-						<div>Таблица откликов будет добавлена после готовности API</div>
+						<Table
+							columns={columns}
+							dataSource={tableData}
+							loading={isResponsesLoading}
+							rowKey="response_id"
+							pagination={{
+								total: responsesData?.total_count,
+								pageSize: responsesData?.filters.limit,
+								current: currentPage,
+							}}
+						/>
 					</Card>
 				</Space>
 			</div>

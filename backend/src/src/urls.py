@@ -29,6 +29,7 @@ urlpatterns = [
         path('', include('auth.urls')),
         path('integrations/', include('integrations.urls')),
         path('chat/', include('ws_chat.urls')),
+        path('fns/', include('fns.urls')),
 
     ])
 

@@ -29,9 +29,6 @@ SECRET_KEY = 'django-insecure-irvru-7-4f2zqfa+bdjw2uqe=+ke0x)11pvpz0cd+9^8o7*asj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ATI_SU_API_KEY=os.getenv("ATI_SU_API_KEY")
-
-
 ALLOWED_HOSTS = [
     "185.68.247.151", 
     "smtlog.ru", 
@@ -72,10 +69,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt',
     'drf_spectacular',
-    'channels',
     "orders",
     "integrations",
-    "ws_chat",
+    "ws_chat"
 ]
 
 MIDDLEWARE = [
@@ -182,7 +178,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -243,3 +239,6 @@ CHANNEL_LAYERS = {
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 150 * 1024 * 1024  # 150MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 150 * 1024 * 1024  # 150MB
+
+FNS_API_KEY = "d11a8b0b43a1dcbdd540035c8102231e6dada8e0"
+ATI_SU_API_KEY = 'ec9071f8893d4e7e868f4f79a5d5cc0c'

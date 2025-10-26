@@ -6,6 +6,7 @@ import {
 	LogoutOutlined,
 	OrderedListOutlined,
 	TruckOutlined,
+	UsergroupAddOutlined,
 	UserOutlined,
 } from '@ant-design/icons'
 import { tokenService } from '@/shared/lib'
@@ -83,6 +84,15 @@ function RouteComponent() {
 								<Title level={4}>Отклики</Title>
 								<Text type="secondary" className="mt-1">
 									Перейти в отображение откликов
+								</Text>
+							</div>
+						</Card>
+						<Card onClick={() => handleNavigateTo('/chat')} hoverable>
+							<div className="flex flex-row gap-5 items-start">
+								<UsergroupAddOutlined className="text-3xl" />
+								<Title level={4}>Мессенджер</Title>
+								<Text type="secondary" className="mt-1">
+									Перейти во внутренний мессенджер
 								</Text>
 							</div>
 						</Card>
