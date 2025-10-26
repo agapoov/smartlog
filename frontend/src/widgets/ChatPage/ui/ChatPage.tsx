@@ -14,7 +14,7 @@ export const ChatPage = () => {
 				{selectedChat ? (
 					<SelectedChat selectedChat={selectedChat} />
 				) : (
-					<div className="flex-1 flex items-center justify-center text-muted-foreground">
+					<div className="flex-1 flex bg-gradient-to-br from-blue-50 to-indigo-100 items-center justify-center text-muted-foreground">
 						<p className="text-lg text-gray-600">Выберите чат для начала общения</p>
 					</div>
 				)}

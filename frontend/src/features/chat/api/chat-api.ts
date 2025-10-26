@@ -24,8 +24,8 @@ export const chatApi = {
 		return $authHost.get<IChat>(`api/chat/chats/${id}/`)
 	},
 
-	async getChatMessages(id: number, params: IGetChatMessagesParams) {
-		return $authHost.get<IGetChatMessagesResponse>(`api/chat/chats/${id}/messages/`, { params: params })
+	async getChatMessages(chat_id: string, params: IGetChatMessagesParams) {
+		return $authHost.get<IGetChatMessagesResponse>(`api/chat/chats/${chat_id}/messages/`, { params: params })
 	},
 
 	async getNotification() {
@@ -44,8 +44,8 @@ export const chatApi = {
 		return $authHost.post<IChat>('api/chat/chats/create/', data)
 	},
 
-	async sendMessage(chatId: number, data: IDtoSendMessage) {
-		return $authHost.post<IMessage>(`api/chat/chats/${chatId}/send/`, data)
+	async sendMessage(chat_id: string, data: IDtoSendMessage) {
+		return $authHost.post<IMessage>(`api/chat/chats/${chat_id}/send/`, data)
 	},
 
 	async addMember(chatId: number, data: IDtoAddMember) {
