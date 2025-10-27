@@ -22,10 +22,14 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 	const queryClient = useQueryClient()
 
 	const { data: response, isLoading } = useGetChatMessages(chatId ?? '', {
-		page_size: 100,
+		page_count: 100,
 	})
 
-	const messages = response?.results ?? []
+	const messages = response?.data ?? []
+
+	const reversedMessages = [...messages].reverse()
+
+	// const pagination = response?.pagination ?? null
 
 	const {
 		send: wsSend,
@@ -124,10 +128,10 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 				<div ref={scrollContainerRef} className="h-full overflow-y-auto space-y-4 pr-2" onScroll={handleScroll}>
 					{isLoading ? (
 						<div className="flex items-center justify-center py-8 text-muted-foreground">Загрузка сообщений...</div>
-					) : messages.length === 0 ? (
+					) : reversedMessages.length === 0 ? (
 						<div className="flex items-center justify-center py-8 text-gray-600">Нет сообщений</div>
 					) : (
-						messages.map((msg) => {
+						reversedMessages.map((msg) => {
 							const isOutgoing = user?.id === msg.sender.id
 							const handleVisible = () => handleMarkAsRead(msg.id)
 

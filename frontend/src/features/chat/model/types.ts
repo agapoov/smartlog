@@ -68,7 +68,7 @@ export interface IGetChatListParams {
 
 export interface IGetChatMessagesParams {
 	page?: number
-	page_size?: number
+	page_count?: number
 }
 
 export interface IDtoCreateChat {
@@ -105,8 +105,12 @@ export interface IGetChatListResponse {
 }
 
 export interface IGetChatMessagesResponse {
-	count: number
-	next: string | null
-	previous: string | null
-	results: IMessage[]
+	pagination: {
+		page_count: number
+		page: number
+		total_count: number
+		has_next: boolean
+		has_previous: boolean
+	}
+	data: IMessage[]
 }
