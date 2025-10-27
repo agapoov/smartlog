@@ -17,20 +17,20 @@ type UseChatWebSocketParams = {
 }
 
 /**
- * Устойчивый к StrictMode WebSocket-хук:
- * - Одно подключение на (chatId + token)
- * - Авто-реконнект
- * - Реакция на входящие сообщения без поля "type"
- * - Поддержка read_message и typing
+ * ✅ Стабильный WebSocket-хук:
+ * - Одно соединение на чат
+ * - Переподключение при смене chatId/token
+ * - Без зацикленных реконнектов
  */
 export const useChatWebSocket = ({ chatId, token, onMessage, onTyping, onReadMessage }: UseChatWebSocketParams) => {
 	const queryClient = useQueryClient()
 	const wsRef = useRef<WebSocket | null>(null)
 	const reconnectTimer = useRef<number | null>(null)
-	const mountedRef = useRef(false)
 	const [connected, setConnected] = useState(false)
 	const [lastMessage, setLastMessage] = useState<IMessage | null>(null)
+	const isManualClose = useRef(false) // ✅ защита от циклов reconnect
 
+	// Очистка таймера реконнекта
 	const clearReconnect = useCallback(() => {
 		if (reconnectTimer.current !== null) {
 			clearTimeout(reconnectTimer.current)
@@ -38,10 +38,29 @@ export const useChatWebSocket = ({ chatId, token, onMessage, onTyping, onReadMes
 		}
 	}, [])
 
+	const disconnect = useCallback(() => {
+		if (!wsRef.current) return
+		console.log('[WS] disconnecting...')
+		isManualClose.current = true
+		clearReconnect()
+
+		wsRef.current.onclose = null
+		wsRef.current.onerror = null
+		wsRef.current.onmessage = null
+		wsRef.current.close(1000, 'manual close')
+		wsRef.current = null
+		setConnected(false)
+	}, [clearReconnect])
+
 	const connect = useCallback(() => {
-		if (!chatId || !token) return
+		if (!chatId || !token) {
+			console.log('[WS] missing chatId or token → skip connect')
+			return
+		}
+
+		// уже есть активное соединение → не создаем новое
 		if (wsRef.current) {
-			console.log('[WS] already connected → skip')
+			console.log('[WS] already connected, skip new connect')
 			return
 		}
 
@@ -51,6 +70,7 @@ export const useChatWebSocket = ({ chatId, token, onMessage, onTyping, onReadMes
 
 		const ws = new WebSocket(wsUrl)
 		wsRef.current = ws
+		isManualClose.current = false
 
 		ws.onopen = () => {
 			console.log('[WS] connected ✅', chatId)
@@ -63,7 +83,8 @@ export const useChatWebSocket = ({ chatId, token, onMessage, onTyping, onReadMes
 			wsRef.current = null
 			setConnected(false)
 
-			if (event.code !== 1000 && event.code !== 1001) {
+			// если закрытие не было вручную → реконнект
+			if (!isManualClose.current && ![1000, 1001].includes(event.code)) {
 				reconnectTimer.current = window.setTimeout(connect, 2000)
 			}
 		}
@@ -72,9 +93,6 @@ export const useChatWebSocket = ({ chatId, token, onMessage, onTyping, onReadMes
 			console.error('[WS] error → reconnect', err)
 			setConnected(false)
 			ws.close()
-			if (!reconnectTimer.current) {
-				reconnectTimer.current = window.setTimeout(connect, 2000)
-			}
 		}
 
 		ws.onmessage = (event) => {
@@ -82,7 +100,6 @@ export const useChatWebSocket = ({ chatId, token, onMessage, onTyping, onReadMes
 				const data = JSON.parse(event.data)
 				console.log('[WS] incoming:', data)
 
-				// ---- обработка системных типов ----
 				if (data.type === 'read_message') {
 					const messageId = data.message_id
 					console.log('[WS] message read:', messageId)
@@ -104,7 +121,7 @@ export const useChatWebSocket = ({ chatId, token, onMessage, onTyping, onReadMes
 					return
 				}
 
-				// ---- обработка обычного сообщения ----
+				// обычное сообщение
 				setLastMessage(data)
 				queryClient.invalidateQueries({ queryKey: [QUERY_GET_CHAT_MESSAGES, chatId] })
 				queryClient.invalidateQueries({ queryKey: [QUERY_GET_ALL_CHATS] })
@@ -131,26 +148,17 @@ export const useChatWebSocket = ({ chatId, token, onMessage, onTyping, onReadMes
 			send({ type: 'read_message', message_id: messageId })
 			queryClient.invalidateQueries({ queryKey: [QUERY_GET_ALL_CHATS] })
 		},
-		[send],
+		[send, queryClient],
 	)
 
+	// 🔥 Переподключение при смене chatId/token
 	useEffect(() => {
-		if (mountedRef.current) return
-		mountedRef.current = true
-
-		if (!chatId || !token) return
-
 		connect()
 
 		return () => {
-			console.log('[WS] cleanup')
-			mountedRef.current = false
-			clearReconnect()
-			wsRef.current?.close()
-			wsRef.current = null
-			setConnected(false)
+			disconnect()
 		}
-	}, [chatId, token])
+	}, [chatId, token]) // без connect/disconnect в deps — чтобы не вызывать повторно при их пересоздании
 
 	return { send, readMessage, connected, lastMessage }
 }
