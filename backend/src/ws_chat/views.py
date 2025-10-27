@@ -174,7 +174,7 @@ def get_chat_messages(request, chat_id):
         serializer = MessageSerializer(paginated_messages, many=True)
         
         return Response({
-            'messages': serializer.data,
+            'data': serializer.data,
             'pagination': {
                 'page': page,
                 'page_count': page_count,
