@@ -11,7 +11,7 @@ from .serializers import (
     MessageSerializer, SendMessageSerializer, AddParticipantSerializer,
     ChatNotificationSerializer
 )
-from src.common import BadRequestException
+from src.common import BadRequestException, paginate
 
 
 class ChatPagination(PageNumberPagination):
@@ -164,14 +164,25 @@ def get_chat_messages(request, chat_id):
             id=chat_id
         )
         
-        messages = chat.messages.select_related('sender').prefetch_related('files').order_by('created_at')
+        messages = chat.messages.select_related('sender').prefetch_related('files').order_by('-created_at')
         
-        paginator = ChatPagination()
-        result_page = paginator.paginate_queryset(messages, request)
+        page = int(request.GET.get('page', 1))
+        page_count = int(request.GET.get('page_count', 20))
         
-        serializer = MessageSerializer(result_page, many=True)
+        paginated_messages = paginate(messages, page, page_count)
         
-        return paginator.get_paginated_response(serializer.data)
+        serializer = MessageSerializer(paginated_messages, many=True)
+        
+        return Response({
+            'data': serializer.data,
+            'pagination': {
+                'page': page,
+                'page_count': page_count,
+                'total_count': messages.count(),
+                'has_next': page * page_count < messages.count(),
+                'has_previous': page > 1
+            }
+        })
         
     except Exception as exc:
         raise BadRequestException(f"Ошибка получения сообщений: {str(exc)}")

@@ -27,6 +27,7 @@ export {
 	SendOutlined,
 	MoreOutlined,
 	ArrowLeftOutlined,
+	LoadingOutlined,
 } from '@ant-design/icons'
 
 export { AppLayout } from './AppLayout.tsx'

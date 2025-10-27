@@ -11,9 +11,14 @@ import type {
 	IGetChatMessagesResponse,
 	IMessage,
 	INotification,
+	IUser,
 } from '../model/types'
 
 export const chatApi = {
+	async getUsersList() {
+		return $authHost.get<IUser[]>('api/users/')
+	},
+
 	async getList(params: IGetChatListParams) {
 		return $authHost.get<IGetChatListResponse>('api/chat/chats/', {
 			params: params,

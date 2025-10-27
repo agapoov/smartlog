@@ -7,6 +7,8 @@ import { useCreateChat, type IDtoCreateChat } from '@/features/chat'
 import useToastStatus from '@/shared/utils/useToastStatus.utils'
 import { useOrdersList } from '@/features/orders'
 import { orderOptions } from '@/widgets/ResponsesPage/ui/ResponsesPage'
+import { useGetAllUsers } from '@/features/chat/hooks/chat.hooks'
+import type { IUser } from '@/features/chat/model/types'
 
 interface IProps {
 	isOpen: boolean
@@ -17,9 +19,12 @@ export const ModalAddChat = ({ isOpen, onClose }: IProps) => {
 	const [name, setName] = useState('')
 	const [description, setDescription] = useState('')
 	const [fileList, setFileList] = useState<UploadFile[]>([])
-	const [selectedOrderId, setSelectedOrderId] = useState<number | null>()
+	const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
+	const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
+
 	const createMutation = useCreateChat()
 	const { data: ordersData, isLoading: isOrdersLoading } = useOrdersList()
+	const { data: usersData, isLoading: isUsersLoading } = useGetAllUsers()
 	const { status, error } = createMutation
 
 	useToastStatus({ status, errorMsg: error?.message })
@@ -35,7 +40,7 @@ export const ModalAddChat = ({ isOpen, onClose }: IProps) => {
 			description: description.trim(),
 			order: selectedOrderId ? Number(selectedOrderId) : 0,
 			logo: fileList[0]?.originFileObj ?? null,
-			participant_ids: [], // можно расширить позже
+			participant_ids: selectedUserIds, // 👈 передаём выбранных участников
 		}
 
 		createMutation.mutate(payload, {
@@ -51,8 +56,15 @@ export const ModalAddChat = ({ isOpen, onClose }: IProps) => {
 		setDescription('')
 		setSelectedOrderId(null)
 		setFileList([])
+		setSelectedUserIds([]) // сбрасываем участников
 		onClose()
 	}
+
+	const userOptions =
+		usersData?.map((user: IUser) => ({
+			label: `${user.first_name} ${user.last_name || ''} (${user.username})`,
+			value: user.id,
+		})) ?? []
 
 	return (
 		<Modal
@@ -71,11 +83,13 @@ export const ModalAddChat = ({ isOpen, onClose }: IProps) => {
 			centered
 		>
 			<div className="space-y-4 py-4">
+				{/* Название */}
 				<div className="space-y-2">
 					<label className="text-sm font-medium block">Название чата</label>
 					<Input placeholder="Чат по заказу #123" value={name} onChange={(e) => setName(e.target.value)} />
 				</div>
 
+				{/* Описание */}
 				<div className="space-y-2">
 					<label className="text-sm font-medium block">Описание</label>
 					<TextArea
@@ -87,6 +101,7 @@ export const ModalAddChat = ({ isOpen, onClose }: IProps) => {
 					/>
 				</div>
 
+				{/* Заказ */}
 				<div className="space-y-2">
 					<label className="text-sm font-medium block">Заказ (опционально)</label>
 					<Select
@@ -95,10 +110,27 @@ export const ModalAddChat = ({ isOpen, onClose }: IProps) => {
 						onChange={setSelectedOrderId}
 						options={orderOptions(ordersData)}
 						placeholder="Выберите заказ"
-						style={{ width: 300 }}
+						style={{ width: '100%' }}
 					/>
 				</div>
 
+				{/* Участники */}
+				<div className="space-y-2">
+					<label className="text-sm font-medium block">Участники</label>
+					<Select
+						mode="multiple"
+						loading={isUsersLoading}
+						value={selectedUserIds}
+						onChange={setSelectedUserIds}
+						options={userOptions}
+						placeholder="Выберите участников"
+						style={{ width: '100%' }}
+						showSearch
+						optionFilterProp="label"
+					/>
+				</div>
+
+				{/* Логотип */}
 				<div className="space-y-2">
 					<label className="text-sm font-medium block">Логотип (опционально)</label>
 					<Upload
@@ -106,7 +138,7 @@ export const ModalAddChat = ({ isOpen, onClose }: IProps) => {
 						onRemove={() => setFileList([])}
 						beforeUpload={(file) => {
 							setFileList([file])
-							return false // отменяем авто-загрузку
+							return false
 						}}
 						maxCount={1}
 					>
