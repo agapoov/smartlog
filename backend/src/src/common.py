@@ -151,3 +151,17 @@ class Base_APIVIEW(APIView):
             status_code = status.HTTP_404_NOT_FOUND
     
         return Response(response, status=status_code)
+
+
+class EnumBaseView(APIView):
+
+    model = None
+
+    def get(self, request):
+        statuses = []
+        for status_code, status_name in self.model.choices:
+            statuses.append({"code": status_code, "name": status_name})
+
+        return Response(
+            {"data": statuses, "total": len(statuses)}, status=status.HTTP_200_OK
+        )

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Order_APIVIEW, Cargo_APIVIEW
+from .views import Order_APIVIEW, Cargo_APIVIEW, CargoType_APIVIEW
 
 urlpatterns = [
     # Orders endpoints
@@ -9,4 +9,5 @@ urlpatterns = [
     # Cargo endpoints
     path('cargo/', Cargo_APIVIEW.as_view(), name='cargo-list'),
     path('cargo/<int:id>/', Cargo_APIVIEW.as_view(), name='cargo-detail'),
+    path('cargo_type_rools/', CargoType_APIVIEW.as_view()),
 ]

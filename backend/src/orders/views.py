@@ -1,6 +1,6 @@
 from .serializers import OrderSerializer, CargoSerializer, OrderCreateSerializer
-from src.common import Base_APIVIEW
-from .models import Cargo, Order
+from src.common import Base_APIVIEW, EnumBaseView
+from .models import Cargo, Order, CargoTypeRools
 
 
 class Order_APIVIEW(Base_APIVIEW):
@@ -14,3 +14,9 @@ class Cargo_APIVIEW(Base_APIVIEW):
     create_serializer = CargoSerializer
     base_serializer = CargoSerializer
     paginate = True
+
+class CargoType_APIVIEW(EnumBaseView):
+    """
+    GET /api/cargo_type_rools/
+    """
+    model = CargoTypeRools

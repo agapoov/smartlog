@@ -27,3 +27,4 @@ anyio==4.11.0
 typing-extensions==4.15.0
 sqlparse==0.5.3
 tzdata==2025.2
+pytz
