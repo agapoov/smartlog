@@ -12,10 +12,20 @@ import type {
 import { chatApi } from '../api/chat-api'
 import {
 	QUERY_GET_ALL_CHATS,
+	QUERY_GET_ALL_USERS,
 	QUERY_GET_CHAT_BY_ID,
 	QUERY_GET_CHAT_MESSAGES,
 	QUERY_GET_NOTIFICATIONS,
 } from '../consts/queryKeys'
+
+export const useGetAllUsers = () =>
+	useQuery({
+		queryKey: [QUERY_GET_ALL_USERS],
+		queryFn: async () => {
+			const res = await chatApi.getUsersList()
+			return res.data
+		},
+	})
 
 export const useGetAllChats = (params?: IGetChatListParams) =>
 	useQuery({

@@ -2,13 +2,14 @@ import { MoreOutlined } from '@/shared/ui'
 import { ScrollArea } from '@/shared/ui/ScrollArea'
 import { Button } from 'antd'
 import { type FC, useCallback } from 'react'
-import { useGetChatMessages, type IChat, useSendMessage } from '@/features/chat'
+import { useGetChatMessages, type IChat } from '@/features/chat'
 import { OutcomeMessage } from '../ui/OutcomeMessage'
 import { IncomingMessage } from '../ui/IncomingMessage'
 import { MessageInput } from '../ui/MessageInput'
-import useToastStatus from '@/shared/utils/useToastStatus.utils'
 import { useChatWebSocket } from '@/features/chat/ws/chatWs.socket'
 import { authUtils } from '@/features/auth'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_GET_ALL_CHATS } from '@/features/chat/consts/queryKeys'
 
 interface IProps {
 	selectedChat: IChat | null
@@ -18,41 +19,38 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 	const token = authUtils.getAccessToken()
 	const user = authUtils.getUser()
 	const chatId = selectedChat?.id
+	const queryClient = useQueryClient()
 
 	const { data: response, isLoading } = useGetChatMessages(chatId ?? '', {
 		page_size: 100,
 	})
-	const httpSend = useSendMessage(chatId ?? '')
-
-	useToastStatus({ status: httpSend.status, errorMsg: httpSend.error?.message })
 
 	const messages = response?.results ?? []
 
-	const { send: wsSend } = useChatWebSocket({
+	const { send: wsSend, readMessage } = useChatWebSocket({
 		chatId: chatId ?? '',
 		token,
-		// onMessage убран — обновление уже в хуке
+		onReadMessage: () => {
+			queryClient.invalidateQueries({ queryKey: [QUERY_GET_ALL_CHATS] })
+		},
 	})
 
 	const handleSend = useCallback(
 		(text: string) => {
 			if (!chatId || !text.trim()) return
-
-			// 1. WebSocket (основной путь)
 			wsSend({
 				type: 'chat_message',
 				content: text.trim(),
 			})
-
-			// 2. HTTP fallback (на случай, если WS не работает)
-			httpSend.mutate(
-				{ content: text.trim(), message_type: 'text' },
-				{
-					onError: () => console.warn('HTTP fallback failed'),
-				},
-			)
 		},
-		[chatId, wsSend, httpSend],
+		[chatId, wsSend],
+	)
+
+	const handleMarkAsRead = useCallback(
+		(msgId: string) => {
+			readMessage(msgId)
+		},
+		[readMessage],
 	)
 
 	if (!selectedChat) {
@@ -86,10 +84,16 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 					) : (
 						messages.map((msg) => {
 							const isOutgoing = user?.id === msg.sender.id
+							const handleVisible = () => {
+								handleMarkAsRead(msg.id)
+							}
+
 							return isOutgoing ? (
 								<OutcomeMessage key={msg.id} message={msg} />
 							) : (
-								<IncomingMessage key={msg.id} message={msg} />
+								<div key={msg.id} onMouseEnter={handleVisible}>
+									<IncomingMessage message={msg} />
+								</div>
 							)
 						})
 					)}

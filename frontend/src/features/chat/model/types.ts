@@ -13,7 +13,12 @@ export interface IMessage {
 	updated_at: string
 	is_edited: boolean
 	sender: IUser
-	files: Array<{ id: string; name: string; url: string }>
+	files: Array<{
+		id: string
+		url: string
+		name: string
+		size?: number
+	}>
 	reply_to: IMessage | null
 }
 
