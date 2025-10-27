@@ -164,7 +164,7 @@ def get_chat_messages(request, chat_id):
             id=chat_id
         )
         
-        messages = chat.messages.select_related('sender').prefetch_related('files').order_by('created_at')
+        messages = chat.messages.select_related('sender').prefetch_related('files').order_by('-created_at')
         
         page = int(request.GET.get('page', 1))
         page_count = int(request.GET.get('page_count', 20))
