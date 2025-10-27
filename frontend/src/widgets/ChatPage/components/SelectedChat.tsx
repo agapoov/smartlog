@@ -1,7 +1,7 @@
 import { MoreOutlined } from '@/shared/ui'
 import { ScrollArea } from '@/shared/ui/ScrollArea'
 import { Button } from 'antd'
-import { type FC, useCallback } from 'react'
+import { type FC, useCallback, useEffect, useRef, useState } from 'react'
 import { useGetChatMessages, type IChat } from '@/features/chat'
 import { OutcomeMessage } from '../ui/OutcomeMessage'
 import { IncomingMessage } from '../ui/IncomingMessage'
@@ -27,13 +27,56 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 
 	const messages = response?.results ?? []
 
-	const { send: wsSend, readMessage } = useChatWebSocket({
+	const {
+		send: wsSend,
+		readMessage,
+		lastMessage,
+	} = useChatWebSocket({
 		chatId: chatId ?? '',
 		token,
 		onReadMessage: () => {
 			queryClient.invalidateQueries({ queryKey: [QUERY_GET_ALL_CHATS] })
 		},
 	})
+
+	// 🔹 Реф на контейнер с сообщениями
+	const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+	const [isUserScrolling, setIsUserScrolling] = useState(false)
+
+	// 🔹 Автоскролл вниз (если пользователь не листает вверх)
+	const scrollToBottom = useCallback((smooth = false) => {
+		const container = scrollContainerRef.current
+		if (!container) return
+		container.scrollTo({
+			top: container.scrollHeight,
+			behavior: smooth ? 'smooth' : 'auto',
+		})
+	}, [])
+
+	// 🔹 При загрузке сообщений — сразу вниз
+	useEffect(() => {
+		if (messages.length > 0) {
+			scrollToBottom(false)
+		}
+	}, [chatId, messages.length, scrollToBottom])
+
+	// 🔹 При отправке или получении нового сообщения — вниз (только если пользователь не листает вверх)
+	useEffect(() => {
+		if (!lastMessage || isUserScrolling) return
+		scrollToBottom(true)
+	}, [lastMessage, isUserScrolling, scrollToBottom])
+
+	// 🔹 Обработчик ручного скролла (чтобы временно отключить автопрокрутку)
+	const handleScroll = useCallback(() => {
+		const container = scrollContainerRef.current
+		if (!container) return
+
+		const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight
+
+		// Если пользователь далеко от низа (>150px) — считаем, что он листает историю
+		const isScrollingUp = distanceFromBottom > 150
+		setIsUserScrolling(isScrollingUp)
+	}, [])
 
 	const handleSend = useCallback(
 		(text: string) => {
@@ -42,8 +85,9 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 				type: 'chat_message',
 				content: text.trim(),
 			})
+			scrollToBottom(true)
 		},
-		[chatId, wsSend],
+		[chatId, wsSend, scrollToBottom],
 	)
 
 	const handleMarkAsRead = useCallback(
@@ -75,8 +119,9 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 				</Button>
 			</header>
 
+			{/* 🔹 Обертка со скроллом */}
 			<ScrollArea className="flex-1 px-4 py-2 bg-gradient-to-br from-blue-50 to-indigo-100">
-				<div className="space-y-4">
+				<div ref={scrollContainerRef} className="h-full overflow-y-auto space-y-4 pr-2" onScroll={handleScroll}>
 					{isLoading ? (
 						<div className="flex items-center justify-center py-8 text-muted-foreground">Загрузка сообщений...</div>
 					) : messages.length === 0 ? (
@@ -84,9 +129,7 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 					) : (
 						messages.map((msg) => {
 							const isOutgoing = user?.id === msg.sender.id
-							const handleVisible = () => {
-								handleMarkAsRead(msg.id)
-							}
+							const handleVisible = () => handleMarkAsRead(msg.id)
 
 							return isOutgoing ? (
 								<OutcomeMessage key={msg.id} message={msg} />
