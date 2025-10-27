@@ -11,8 +11,8 @@ class FNSCompanyInfoView(APIView):
     API для получения информации об организации из ФНС по ОГРН
     """
 
-    def post(self, request):
-        serializer = FNSRequestSerializer(data=request.data)
+    def get(self, request):
+        serializer = FNSRequestSerializer(data=request.query_params)
 
         if not serializer.is_valid():
             return Response(
