@@ -10,6 +10,7 @@ class Order(models.Model): # заказ
     class OrderStatus(models.TextChoices):
         DRAFT = 'DRAFT', 'Черновик'
         POSTED = 'POSTED', 'Опубликован'
+        CONFIRMATION = 'CONFIRMATION', 'Утверждение'
         COMPLETED = 'COMPLETED', 'Выполнен'
         CLOSED = 'CLOSED', 'Закрыт'
 

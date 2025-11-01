@@ -229,6 +229,9 @@ def post_order(request, **kwargs):
 
 @api_view(['GET'])
 def rools_order_status(request):
+    """
+    API статусов заказов
+    """
     url = f"{ROOLS_BASE}public-api/v1/system/offers/statuses/?apikey={ROOLS_API_KEY}"
 
     try:
@@ -243,3 +246,85 @@ def rools_order_status(request):
     data = resp.json()
 
     return Response(data)
+
+@api_view(['PATCH'])
+def change_order_status(request, order_id):
+    """
+    API статусов заказов
+    """
+    order = Order.objects.filter(id=order_id)
+    if not order:
+        return Response(
+            {"details": "Заказ не найден"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    new_status = request.data.get("status")
+
+    if new_status not in Order.OrderStatus.choices:
+        return Response(
+            {"details": f"Некорректное значение статуса. Доступные: {', '.join(Order.OrderStatus.choices)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    #   Наши статусы
+    # DRAFT = 'DRAFT', 'Черновик'
+    # POSTED = 'POSTED', 'Опубликован'
+    # CONFIRMATION = 'CONFIRMATION', 'Утверждение'
+    # COMPLETED = 'COMPLETED', 'Выполнен'
+    # CLOSED = 'CLOSED', 'Закрыт'
+
+    #   Статусы rools
+    # "not_published",
+    # "published",
+    # "await_confirm",
+    # "confirmation",
+    # "deal_made",
+    # "closed"
+
+    rools_status_mapping = {
+        "DRAFT" : "not_published",
+        "POSTED" : "published",
+        "CONFIRMATION" : "confirmation",
+        "COMPLETED" : "deal_made",
+        "CLOSED" : "closed",
+    }
+
+    if order.ati_id:
+        # Тут логика смены статуса на бирже ATI.SU
+        ati_success = True
+        ati_resp = {}
+        pass
+
+    if order.rools_id:
+        rools_success = False
+
+        url = f"{ROOLS_BASE}public-api/v1/exchange/offer/{order.rools_id}/status?apikey={ROOLS_API_KEY}"
+        payload = {"status": rools_status_mapping[new_status]}
+
+        try:
+            rools_resp = requests.patch(url, json=payload, timeout=10)
+            rools_resp.raise_for_status()
+        except requests.RequestException as e:
+            return Response(
+                {"details": "Ошибка при получении данных от API ROOLS"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if rools_resp.json() == {}:
+            rools_success = True
+
+    if not rools_success:
+        return Response(
+            {"details": f"Не удалось изменить статус на ROOLS. Ошибка: {rools_resp.json()}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if not ati_success:
+        return Response(
+            {"details": f"Не удалось изменить статус на ATI.SU. Ошибка: {ati_resp.json()}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    order.update(status=new_status)
+    return Response(
+        {"message": "Статус успешно изменён"}
+    )
