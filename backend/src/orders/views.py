@@ -34,7 +34,7 @@ def change_order_status(request, order_id):
     """
     API статусов заказов
     """
-    order = Order.objects.filter(id=order_id)
+    order = Order.objects.filter(id=order_id).first()
     if not order:
         return Response(
             {"details": "Заказ не найден"},
@@ -43,9 +43,10 @@ def change_order_status(request, order_id):
 
     new_status = request.data.get("status")
 
-    if new_status not in Order.OrderStatus.choices:
+    valid_statuses = [value for value, label in Order.OrderStatus.choices]
+    if new_status not in valid_statuses:
         return Response(
-            {"details": f"Некорректное значение статуса. Доступные: {', '.join(Order.OrderStatus.choices)}"},
+            {"details": f"Некорректное значение статуса. Доступные: {', '.join(valid_statuses)}"},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -72,13 +73,14 @@ def change_order_status(request, order_id):
         "CLOSED" : "closed",
     }
     rools_success = None
-    ati_success = None
+    ati_success = True # Пока логики нет, сделаем его по дефолту успешным
 
     if order.ati_id:
         # Тут логика смены статуса на бирже ATI.SU
-        ati_resp = {}
         pass
 
+    ati_resp = {}
+    rools_resp = {}
     if order.rools_id:
         rools_success = False
 
@@ -103,11 +105,12 @@ def change_order_status(request, order_id):
         )
     if not ati_success:
         return Response(
-            {"details": f"Не удалось изменить статус на ATI.SU. Ошибка: {ati_resp.json()}"},
+            {"details": f"Не удалось изменить статус на ATI.SU."},
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    order.update(status=new_status)
+    order.status = new_status
+    order.save()
     return Response(
         {"message": "Статус успешно изменён"}
     )

@@ -246,3 +246,23 @@ def rools_order_status(request):
     data = resp.json()
 
     return Response(data)
+
+@api_view(["GET"])
+def rools_offer_details(request):
+    """
+    Апи для получения информации о заказе из rools
+    """
+    rools_id = request.GET.get("rools_id")
+    url = f"{ROOLS_BASE}public-api/v1/exchange/offer/{rools_id}/?apikey={ROOLS_API_KEY}"
+    try:
+        resp = requests.get(url)
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        return Response(
+            {"details": "Ошибка при получении данных от API ROOLS"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    data = resp.json()
+
+    return Response(data)

@@ -21,5 +21,6 @@ urlpatterns = [
         path("geo_search/", get_geo_info),
         path("order_status/", rools_order_status),
         path("post_order/", post_order),
+        path("order_details/", rools_offer_details),
     ]))
 ]
