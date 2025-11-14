@@ -1,6 +1,3 @@
-// Экспорт базовых API клиентов
-export { $host, $auth } from './base'
-
 // Экспорт auth-специфичных компонентов
 export { authApi, $authHost, authErrorHandler, authUtils, type LoginRequest, type TokenResponse } from '@/features/auth'
 

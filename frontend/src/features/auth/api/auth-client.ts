@@ -1,88 +1,103 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios'
 import { tokenService } from '@/shared/lib/token-service'
-import { $host } from '@/shared/api/base'
 import { RefreshResponseSchema } from '../model/types'
+import { authStore } from '../store/auth.store'
 
+export const $host = axios.create({
+	baseURL: import.meta.env.VITE_APP_URL,
+	withCredentials: false,
+})
 // Авторизованный клиент
 export const $authHost = axios.create({
 	baseURL: import.meta.env.VITE_APP_URL,
 	withCredentials: false,
 })
 
-// Interceptor для добавления токена авторизации
+// --- REQUEST INTERCEPTOR ---
 const authInterceptor = (config: InternalAxiosRequestConfig) => {
-	if (!config || !config.headers) {
-		throw new Error('Axios: не задан config')
-	}
-
+	if (!config?.headers) throw new Error('Axios: не задан config')
 	const token = tokenService.access
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`
 	}
-
 	return config
 }
-
-// Навешиваем interceptor на запросы
 $authHost.interceptors.request.use(authInterceptor)
 
-// Interceptor для обработки 401 ошибок и автоматического обновления токенов
+// --- ОЧЕРЕДЬ ДЛЯ ПАРАЛЛЕЛЬНЫХ 401 ---
+let isRefreshing = false
+let failedQueue: Array<{ resolve: (v: any) => void; reject: (e: any) => void }> = []
+
+const processQueue = (error: any, token: string | null = null) => {
+	failedQueue.forEach(({ resolve, reject }) => (error ? reject(error) : resolve(token)))
+	failedQueue = []
+}
+
+$authHost.interceptors.response.use(
+	(r) => (console.log('OK:', r.config.url), r),
+	(e) => (console.log('ERR:', e.config?.url, e.response?.status), Promise.reject(e)),
+)
+
+// --- RESPONSE INTERCEPTOR (основной) ---
 $authHost.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config
 
-		// Если ошибка не 401, просто отклоняем
-		if (error.response?.status !== 401) {
+		if (error.response?.status !== 401 || originalRequest._retry) {
 			return Promise.reject(error)
 		}
 
-		// Избегаем бесконечного цикла обновления токенов
-		if (originalRequest._retry) {
-			tokenService.clear()
-			return Promise.reject(error)
+		// Если уже обновляем — ставим в очередь
+		if (isRefreshing) {
+			return new Promise((resolve, reject) => {
+				failedQueue.push({ resolve, reject })
+			})
+				.then((token) => {
+					originalRequest.headers.Authorization = `Bearer ${token}`
+					return $authHost(originalRequest)
+				})
+				.catch((err) => Promise.reject(err))
 		}
 
 		originalRequest._retry = true
+		isRefreshing = true
 
 		try {
-			const refreshToken = tokenService.refresh
-			if (!refreshToken) {
-				tokenService.clear()
-				return Promise.reject(error)
+			if (!tokenService.needsRefresh()) {
+				throw new Error('Refresh token expired or missing')
 			}
 
 			const response = await $host.post('api/token/refresh/', {
-				refresh: refreshToken,
+				refresh: tokenService.refresh,
 			})
 
 			const validatedData = RefreshResponseSchema.parse(response.data)
-			tokenService.setAccess(validatedData.access)
+			const newAccessToken = validatedData.access
 
-			// Повторяем оригинальный запрос с новым токеном
-			originalRequest.headers.Authorization = `Bearer ${validatedData.access}`
-			return axios(originalRequest)
+			tokenService.setAccess(newAccessToken)
+			processQueue(null, newAccessToken)
+
+			originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
+			return $authHost(originalRequest)
 		} catch (refreshError) {
-			tokenService.clear()
+			processQueue(refreshError, null)
+			await authStore.logout() // ← ЕДИНСТВЕННАЯ ТОЧКА ВЫХОДА
 			return Promise.reject(refreshError)
+		} finally {
+			isRefreshing = false
 		}
 	},
 )
 
-// Общий перехватчик ошибок
+// --- ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (оставь, но ниже основного) ---
 $authHost.interceptors.response.use(
 	(response) => response,
 	(error) => {
 		const modifiedError = error
 		let errorMessage = 'Произошла неизвестная ошибка'
-
-		if (error.response?.data?.details) {
-			errorMessage = error.response.data.details
-		}
-		if (error.response?.data?.detail) {
-			errorMessage = error.response.data.detail
-		}
-
+		if (error.response?.data?.details) errorMessage = error.response.data.details
+		if (error.response?.data?.detail) errorMessage = error.response.data.detail
 		modifiedError.message = errorMessage
 		throw modifiedError
 	},

@@ -1,7 +1,7 @@
-import { $host } from '../../../shared/api/base'
 import { tokenService } from '../../../shared/lib/token-service'
 import { type LoginRequest, type TokenResponse, TokenResponseSchema, RefreshResponseSchema } from '../model/types'
 import { authStore } from '../store/auth.store'
+import { $host } from './auth-client'
 
 export interface RegisterRequest {
 	username: string
