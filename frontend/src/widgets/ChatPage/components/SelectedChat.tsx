@@ -1,6 +1,6 @@
 import { MoreOutlined } from '@/shared/ui'
 import { ScrollArea } from '@/shared/ui/ScrollArea'
-import { Button } from 'antd'
+import { Button, Tooltip } from 'antd'
 import { type FC, useCallback, useEffect, useRef, useState } from 'react'
 import { useGetChatMessages, type IChat } from '@/features/chat'
 import { OutcomeMessage } from '../ui/OutcomeMessage'
@@ -118,9 +118,11 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 						<p className="text-sm text-muted-foreground">{selectedChat.participants_count} участников</p>
 					</div>
 				</div>
-				<Button size="small">
-					<MoreOutlined />
-				</Button>
+				<Tooltip title="Функция в разработке">
+					<Button size="small">
+						<MoreOutlined />
+					</Button>
+				</Tooltip>
 			</header>
 
 			{/* 🔹 Обертка со скроллом */}

@@ -1,6 +1,6 @@
 import type { IMessage } from '@/features/chat'
 import { MoreOutlined, PaperClipOutlined } from '@/shared/ui'
-import { Button } from 'antd'
+import { Button, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import type { FC } from 'react'
 
@@ -13,7 +13,11 @@ export const OutcomeMessage: FC<IProps> = ({ message }) => {
 
 	return (
 		<div className="flex justify-end gap-2 px-4 ">
-			<Button type="text" size="small" icon={<MoreOutlined />} />
+			<Tooltip title="Функция в разработке">
+				{' '}
+				<Button type="text" size="small" icon={<MoreOutlined />} />
+			</Tooltip>
+
 			<div className=" flex bg-gray-50 rounded-lg flex-col">
 				{message.reply_to && (
 					<div className="relative bg-gray-300 m-2 rounded-xl rounded-l-none p-2 text-sm">

@@ -1,6 +1,6 @@
 import type { IMessage } from '@/features/chat'
 import { ArrowLeftOutlined, MoreOutlined, PaperClipOutlined } from '@/shared/ui'
-import { Button } from 'antd'
+import { Button, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import type { FC } from 'react'
 
@@ -49,7 +49,9 @@ export const IncomingMessage: FC<IProps> = ({ message }) => {
 			</div>
 
 			{/* Кнопка More — появляется справа при ховере */}
-			<Button type="text" size="small" icon={<MoreOutlined />} />
+			<Tooltip title="Функция в разработке">
+				<Button type="text" size="small" icon={<MoreOutlined />} />
+			</Tooltip>
 		</div>
 	)
 }

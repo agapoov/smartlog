@@ -1,5 +1,5 @@
 import { PaperClipOutlined, SendOutlined } from '@/shared/ui'
-import { Button } from 'antd'
+import { Button, Tooltip } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useEffect, useRef, useState, type FC } from 'react'
 
@@ -32,9 +32,11 @@ export const MessageInput: FC<IProps> = ({ onSend }) => {
 
 	return (
 		<div className="flex items-end gap-2 p-4 border-t border-border bg-background">
-			<Button className="shrink-0" disabled>
-				<PaperClipOutlined />
-			</Button>
+			<Tooltip title="Функция в разработке">
+				<Button className="shrink-0" disabled>
+					<PaperClipOutlined />
+				</Button>
+			</Tooltip>
 
 			<div className="flex-1">
 				<TextArea
