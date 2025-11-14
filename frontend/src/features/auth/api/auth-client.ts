@@ -82,7 +82,7 @@ $authHost.interceptors.response.use(
 			return $authHost(originalRequest)
 		} catch (refreshError) {
 			processQueue(refreshError, null)
-			await authStore.logout() // ← ЕДИНСТВЕННАЯ ТОЧКА ВЫХОДА
+			await authStore.logout()
 			return Promise.reject(refreshError)
 		} finally {
 			isRefreshing = false

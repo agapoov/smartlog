@@ -1,11 +1,12 @@
-import { Button, Input } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { Button, Input, Tooltip } from 'antd'
+import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons'
 import { useState, type FC } from 'react'
 import { ScrollArea } from '@/shared/ui/ScrollArea'
 import { ChatCard } from '../ui/ChatCard'
 import { useGetAllChats, type IChat } from '@/features/chat'
 import { ModalAddChat } from '../ui/ModalAddChat'
 import useToastStatus from '@/shared/utils/useToastStatus.utils'
+import { useNavigate } from '@tanstack/react-router'
 
 interface IProps {
 	selectedChat: IChat | null
@@ -15,6 +16,7 @@ interface IProps {
 export const ChatList: FC<IProps> = ({ selectedChat, setSelectedChat }) => {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [modalAdd, setModalAdd] = useState(false)
+	const navigate = useNavigate()
 
 	const {
 		data: response,
@@ -34,7 +36,18 @@ export const ChatList: FC<IProps> = ({ selectedChat, setSelectedChat }) => {
 		<aside className="flex flex-col w-full md:w-sm border-r border-gray-200">
 			<header className="p-4 border-b border-gray-200">
 				<div className="flex items-center justify-between mb-4">
-					<h1 className="text-2xl font-bold">Чаты</h1>
+					<div className="flex items-center gap-3">
+						<Tooltip title={'На главную'}>
+							<Button
+								onClick={() => navigate({ to: '/' })}
+								className="text-gray-600 hover:text-gray-900"
+								icon={<ArrowLeftOutlined />}
+							/>
+						</Tooltip>
+
+						<h1 className="text-2xl font-bold">Чаты</h1>
+					</div>
+
 					<Button onClick={() => setModalAdd(true)} size="small">
 						<PlusOutlined />
 					</Button>

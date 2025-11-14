@@ -1,16 +1,13 @@
+// widgets/CargoPage.tsx
 import { useMemo, useState } from 'react'
-import { AppLayout, Button, Card, Form, Input, Modal, Select, Space, Table } from '@/shared/ui'
+import { Button, Card, Form, Input, Modal, Select, Space, Table, Tag } from 'antd'
 import { useCargoList, useCreateCargo, CargoType, type CreateCargoRequest, type Cargo } from '@/shared/api'
-import { AppHeader } from '@/shared/ui/AppHeader'
+import { MainLayout } from '@/shared/ui/MainLayout' // ← новый лейаут
 import { getCargoTypeDisplay } from '@/shared/utils/cargoType.utils'
-import { Tag } from 'antd'
 
 const cargoTypeOptions = Object.values(CargoType).map((value) => {
 	const { label, tagColor } = getCargoTypeDisplay(value)
-	return {
-		label: <Tag color={tagColor}>{label}</Tag>,
-		value,
-	}
+	return { label: <Tag color={tagColor}>{label}</Tag>, value }
 })
 
 export const CargoPage = () => {
@@ -46,28 +43,25 @@ export const CargoPage = () => {
 	}
 
 	return (
-		<AppLayout>
-			<div className="max-w-5xl mx-auto pt-8">
-				<Space direction="vertical" size="large" className="w-full">
-					<AppHeader showGoBack title="Грузы" />
-					<Card
-						title="Список грузов"
-						extra={
-							<Button type="primary" onClick={() => setOpen(true)}>
-								Создать груз
-							</Button>
-						}
-					>
-						<Table<Cargo>
-							rowKey={(r: Cargo) => `${r.name}-${r.cargo_type}-${r.cargo_weight}-${r.cargo_volume}`}
-							loading={isLoading}
-							columns={columns}
-							dataSource={data?.data as Cargo[]}
-							pagination={false}
-						/>
-					</Card>
-				</Space>
-			</div>
+		<MainLayout title="Грузы" showGoBack>
+			<Space direction="vertical" size="large" className="w-full">
+				<Card
+					title="Список грузов"
+					extra={
+						<Button type="primary" onClick={() => setOpen(true)}>
+							Создать груз
+						</Button>
+					}
+				>
+					<Table<Cargo>
+						rowKey={(r) => `${r.name}-${r.cargo_type}-${r.cargo_weight}-${r.cargo_volume}`}
+						loading={isLoading}
+						columns={columns}
+						dataSource={data?.data as Cargo[]}
+						pagination={false}
+					/>
+				</Card>
+			</Space>
 
 			<Modal
 				open={open}
@@ -92,6 +86,6 @@ export const CargoPage = () => {
 					</Form.Item>
 				</Form>
 			</Modal>
-		</AppLayout>
+		</MainLayout>
 	)
 }

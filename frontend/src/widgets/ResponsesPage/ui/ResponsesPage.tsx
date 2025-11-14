@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { AppLayout, Card, Space, Table } from '@/shared/ui'
-import { AppHeader } from '@/shared/ui/AppHeader'
+import { Card, Space, Table } from '@/shared/ui'
 import { useOrdersList } from '@/features/orders/hooks/orders.hooks'
 import { useResponsesList } from '@/features/offers'
 import { Select } from '@/shared/ui'
 import type { Order } from '@/features/orders'
+import { MainLayout } from '@/shared/ui/MainLayout'
 
 export const orderOptions = (ordersData: { data: Order | Order[] } | undefined) =>
 	ordersData
@@ -101,47 +101,44 @@ export const ResponsesPage = () => {
 			: 1
 
 	return (
-		<AppLayout>
-			<div className="max-w-5xl mx-auto pt-8">
-				<Space direction="vertical" size="large" className="w-full">
-					<AppHeader showGoBack title="Отклики" />
-					<Card
-						title="Фильтры откликов"
-						extra={
-							<div className="flex gap-2">
-								<Select
-									loading={isOrdersLoading}
-									value={selectedOrderId}
-									onChange={setSelectedOrderId}
-									options={orderOptions(ordersData)}
-									placeholder="Выберите заказ"
-									style={{ width: 300 }}
-								/>
-								<Select
-									value={selectedStatus}
-									onChange={setSelectedStatus}
-									options={statusOptions}
-									placeholder="Выберите статус"
-									allowClear
-									style={{ width: 200 }}
-								/>
-							</div>
-						}
-					>
-						<Table
-							columns={columns}
-							dataSource={tableData}
-							loading={isResponsesLoading}
-							rowKey="response_id"
-							pagination={{
-								total: responsesData?.total_count,
-								pageSize: responsesData?.filters.limit,
-								current: currentPage,
-							}}
-						/>
-					</Card>
-				</Space>
-			</div>
-		</AppLayout>
+		<MainLayout title="Отклики" showGoBack>
+			<Space direction="vertical" size="large" className="w-full">
+				<Card
+					title="Фильтры откликов"
+					extra={
+						<div className="flex gap-2">
+							<Select
+								loading={isOrdersLoading}
+								value={selectedOrderId}
+								onChange={setSelectedOrderId}
+								options={orderOptions(ordersData)}
+								placeholder="Выберите заказ"
+								style={{ width: 300 }}
+							/>
+							<Select
+								value={selectedStatus}
+								onChange={setSelectedStatus}
+								options={statusOptions}
+								placeholder="Выберите статус"
+								allowClear
+								style={{ width: 200 }}
+							/>
+						</div>
+					}
+				>
+					<Table
+						columns={columns}
+						dataSource={tableData}
+						loading={isResponsesLoading}
+						rowKey="response_id"
+						pagination={{
+							total: responsesData?.total_count,
+							pageSize: responsesData?.filters.limit,
+							current: currentPage,
+						}}
+					/>
+				</Card>
+			</Space>
+		</MainLayout>
 	)
 }

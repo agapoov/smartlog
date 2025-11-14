@@ -1,4 +1,5 @@
 import { ConfigProvider } from 'antd'
+import './main.css'
 import ruRU from 'antd/locale/ru_RU'
 import { StrictMode } from 'react'
 import './index.css'
