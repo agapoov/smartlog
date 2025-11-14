@@ -1,8 +1,8 @@
-import { MoreOutlined } from '@/shared/ui'
+import { MoreOutlined } from '@ant-design/icons'
 import { ScrollArea } from '@/shared/ui/ScrollArea'
-import { Button, Tooltip } from 'antd'
+import { Button } from 'antd'
 import { type FC, useCallback, useEffect, useRef, useState } from 'react'
-import { useGetChatMessages, type IChat } from '@/features/chat'
+import { useAddMember, useGetChatMessages, type IChat } from '@/features/chat'
 import { OutcomeMessage } from '../ui/OutcomeMessage'
 import { IncomingMessage } from '../ui/IncomingMessage'
 import { MessageInput } from '../ui/MessageInput'
@@ -10,6 +10,8 @@ import { useChatWebSocket } from '@/features/chat/ws/chatWs.socket'
 import { authUtils } from '@/features/auth'
 import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_GET_ALL_CHATS } from '@/features/chat/consts/queryKeys'
+import { ModalAddMembers } from './ModalAddMembers'
+import useToastStatus from '@/shared/utils/useToastStatus.utils'
 
 interface IProps {
 	selectedChat: IChat | null
@@ -26,10 +28,7 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 	})
 
 	const messages = response?.data ?? []
-
 	const reversedMessages = [...messages].reverse()
-
-	// const pagination = response?.pagination ?? null
 
 	const {
 		send: wsSend,
@@ -43,11 +42,12 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 		},
 	})
 
-	// 🔹 Реф на контейнер с сообщениями
+	const addMember = useAddMember(chatId!)
+
 	const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 	const [isUserScrolling, setIsUserScrolling] = useState(false)
+	const [modalOpen, setModalOpen] = useState(false)
 
-	// 🔹 Автоскролл вниз (если пользователь не листает вверх)
 	const scrollToBottom = useCallback((smooth = false) => {
 		const container = scrollContainerRef.current
 		if (!container) return
@@ -57,29 +57,22 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 		})
 	}, [])
 
-	// 🔹 При загрузке сообщений — сразу вниз
 	useEffect(() => {
 		if (messages.length > 0) {
 			scrollToBottom(false)
 		}
 	}, [chatId, messages.length, scrollToBottom])
 
-	// 🔹 При отправке или получении нового сообщения — вниз (только если пользователь не листает вверх)
 	useEffect(() => {
 		if (!lastMessage || isUserScrolling) return
 		scrollToBottom(true)
 	}, [lastMessage, isUserScrolling, scrollToBottom])
 
-	// 🔹 Обработчик ручного скролла (чтобы временно отключить автопрокрутку)
 	const handleScroll = useCallback(() => {
 		const container = scrollContainerRef.current
 		if (!container) return
-
 		const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight
-
-		// Если пользователь далеко от низа (>150px) — считаем, что он листает историю
-		const isScrollingUp = distanceFromBottom > 150
-		setIsUserScrolling(isScrollingUp)
+		setIsUserScrolling(distanceFromBottom > 150)
 	}, [])
 
 	const handleSend = useCallback(
@@ -101,6 +94,14 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 		[readMessage],
 	)
 
+	const handleAddParticipants = (userIds: number[]) => {
+		for (const userId of userIds) {
+			addMember.mutateAsync({ user_id: userId, is_admin: false })
+		}
+	}
+
+	useToastStatus({ status: addMember.status, errorMsg: addMember.error })
+
 	if (!selectedChat) {
 		return (
 			<div className="flex-1 flex items-center justify-center text-muted-foreground">
@@ -111,21 +112,19 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 
 	return (
 		<>
-			<header className="flex items-center justify-between p-4 border-b border-border">
+			<header className="flex items-center justify-between p-4 border-b border-gray-200">
 				<div className="flex items-center gap-3">
 					<div>
 						<h2 className="font-semibold">{selectedChat.name}</h2>
 						<p className="text-sm text-muted-foreground">{selectedChat.participants_count} участников</p>
 					</div>
 				</div>
-				<Tooltip title="Функция в разработке">
-					<Button size="small">
-						<MoreOutlined />
-					</Button>
-				</Tooltip>
+
+				<Button size="small" onClick={() => setModalOpen(true)}>
+					<MoreOutlined />
+				</Button>
 			</header>
 
-			{/* 🔹 Обертка со скроллом */}
 			<ScrollArea className="flex-1 px-4 py-2 bg-gradient-to-br from-blue-50 to-indigo-100">
 				<div ref={scrollContainerRef} className="h-full overflow-y-auto space-y-4 pr-2" onScroll={handleScroll}>
 					{isLoading ? (
@@ -136,7 +135,6 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 						reversedMessages.map((msg) => {
 							const isOutgoing = user?.id === msg.sender.id
 							const handleVisible = () => handleMarkAsRead(msg.id)
-
 							return isOutgoing ? (
 								<OutcomeMessage key={msg.id} message={msg} />
 							) : (
@@ -150,6 +148,13 @@ export const SelectedChat: FC<IProps> = ({ selectedChat }) => {
 			</ScrollArea>
 
 			<MessageInput onSend={handleSend} />
+
+			<ModalAddMembers
+				chat={selectedChat}
+				open={modalOpen}
+				onClose={() => setModalOpen(false)}
+				onAddParticipants={handleAddParticipants}
+			/>
 		</>
 	)
 }

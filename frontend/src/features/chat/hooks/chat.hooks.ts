@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
 import type {
 	IChat,
 	IDtoAddMember,
@@ -36,13 +36,18 @@ export const useGetAllChats = (params?: IGetChatListParams) =>
 		},
 	})
 
-export const useGetChatById = (id: string | number) =>
-	useQuery({
+export const useGetChatById = (
+	id: string | number,
+	options?: { enabled?: boolean } & Omit<UseQueryOptions<IChat, Error>, 'queryKey' | 'queryFn'>,
+) =>
+	useQuery<IChat, Error>({
 		queryKey: [QUERY_GET_CHAT_BY_ID, id],
 		queryFn: async () => {
-			const res = await chatApi.getItem(Number(id))
+			const res = await chatApi.getItem(String(id))
 			return res.data
 		},
+		enabled: options?.enabled ?? true,
+		...options,
 	})
 
 export const useGetChatMessages = (chatId: string, params?: IGetChatMessagesParams) =>
@@ -84,10 +89,10 @@ export const useSendMessage = (chatId: string) => {
 	})
 }
 
-export const useAddMember = (chatId: string | number) => {
+export const useAddMember = (chatId: string) => {
 	const queryClient = useQueryClient()
 	return useMutation<void, Error, IDtoAddMember>({
-		mutationFn: (data) => chatApi.addMember(Number(chatId), data).then(() => {}),
+		mutationFn: (data) => chatApi.addMember(chatId, data).then(() => {}),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: [QUERY_GET_CHAT_BY_ID, chatId] })
 			queryClient.invalidateQueries({ queryKey: [QUERY_GET_ALL_CHATS] })
@@ -95,7 +100,7 @@ export const useAddMember = (chatId: string | number) => {
 	})
 }
 
-export const useUpdateChat = (chatId: string | number) => {
+export const useUpdateChat = (chatId: string) => {
 	const queryClient = useQueryClient()
 	return useMutation<IChat, Error, IDtoPutChat>({
 		mutationFn: (data) => chatApi.updateChat(Number(chatId), data).then((res) => res.data),
@@ -106,10 +111,11 @@ export const useUpdateChat = (chatId: string | number) => {
 	})
 }
 
-export const useRemoveMember = (chatId: string | number, userId: number) => {
+export const useRemoveMember = (chatId: string) => {
 	const queryClient = useQueryClient()
-	return useMutation<void, Error, void>({
-		mutationFn: () => chatApi.removeMember(Number(chatId), userId).then(() => {}),
+
+	return useMutation<void, Error, number>({
+		mutationFn: (userId: number) => chatApi.removeMember(chatId, userId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: [QUERY_GET_CHAT_BY_ID, chatId] })
 			queryClient.invalidateQueries({ queryKey: [QUERY_GET_ALL_CHATS] })

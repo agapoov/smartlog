@@ -3,6 +3,7 @@ export interface IUser {
 	username: string
 	first_name: string
 	last_name: string
+	email?: string
 }
 
 export interface IMessage {
@@ -22,6 +23,13 @@ export interface IMessage {
 	reply_to: IMessage | null
 }
 
+export interface IParticipant {
+	user: IUser
+	joined_at: string
+	is_admin: boolean
+	is_muted: boolean
+}
+
 export interface IChat {
 	id: string
 	name: string
@@ -31,7 +39,8 @@ export interface IChat {
 	created_at: string
 	updated_at: string
 	is_active: boolean
-	order: number | null
+	order: number
+	participants: IParticipant[]
 	participants_count: number
 	last_message: IMessage | null
 	unread_count: number

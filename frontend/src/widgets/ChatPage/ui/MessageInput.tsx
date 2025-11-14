@@ -31,7 +31,7 @@ export const MessageInput: FC<IProps> = ({ onSend }) => {
 	}, [])
 
 	return (
-		<div className="flex items-end gap-2 p-4 border-t border-border bg-background">
+		<div className="flex items-end gap-2 p-4 border-t border-gray-200 bg-background">
 			<Tooltip title="Функция в разработке">
 				<Button className="shrink-0" disabled>
 					<PaperClipOutlined />

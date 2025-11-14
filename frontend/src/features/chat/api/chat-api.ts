@@ -25,7 +25,7 @@ export const chatApi = {
 		})
 	},
 
-	async getItem(id: number) {
+	async getItem(id: string) {
 		return $authHost.get<IChat>(`api/chat/chats/${id}/`)
 	},
 
@@ -53,18 +53,19 @@ export const chatApi = {
 		return $authHost.post<IMessage>(`api/chat/chats/${chat_id}/send/`, data)
 	},
 
-	async addMember(chatId: number, data: IDtoAddMember) {
-		return $authHost.post<any>(`api/chat/chats/${chatId}/send/`, data)
+	async addMember(chatId: string, data: IDtoAddMember) {
+		return $authHost.post(`api/chat/chats/${chatId}/send/`, data)
 	},
 
 	async updateChat(chat_id: number, data: IDtoPutChat) {
-		return $authHost.put<any>(`api/chat/chats/${chat_id}/update/`, data)
+		return $authHost.put(`api/chat/chats/${chat_id}/update/`, data)
 	},
 
-	async removeMember(chat_id: number, user_id: number) {
-		return $authHost.delete<any>(`api/chat/chats/${chat_id}/remove-participant/${user_id}/`)
+	async removeMember(chat_id: string, user_id: number) {
+		await $authHost.delete(`api/chat/chats/${chat_id}/remove-participant/${user_id}/`)
 	},
+
 	async deleteChat(chat_id: number) {
-		return $authHost.delete<any>(`api/chat/chats/${chat_id}/delete/`)
+		return $authHost.delete(`api/chat/chats/${chat_id}/delete/`)
 	},
 }
