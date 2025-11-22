@@ -19,7 +19,7 @@ export const ModalOrderAdd: FC<IProps> = ({ open, setOpen }) => {
 		() =>
 			cargoData?.data.map((cargo: Cargo) => ({
 				label: `${cargo.name} (${cargo.cargo_type}, ${cargo.cargo_weight} кг, ${cargo.cargo_volume} м³)`,
-				value: cargoData.data.indexOf(cargo) + 1,
+				value: cargo.id,
 			})) || [],
 		[cargoData],
 	)
