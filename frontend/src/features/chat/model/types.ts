@@ -84,7 +84,7 @@ export interface IDtoCreateChat {
 	name: string
 	description: string
 	logo?: File | null
-	order: number
+	order?: number | null
 	participant_ids?: number[]
 }
 

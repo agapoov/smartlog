@@ -38,9 +38,9 @@ export const ModalAddChat = ({ isOpen, onClose }: IProps) => {
 		const payload: IDtoCreateChat = {
 			name: name.trim(),
 			description: description.trim(),
-			order: selectedOrderId ? Number(selectedOrderId) : 0,
+			...(selectedOrderId ? { order: Number(selectedOrderId) } : {}),
 			logo: fileList[0]?.originFileObj ?? null,
-			participant_ids: selectedUserIds, // 👈 передаём выбранных участников
+			participant_ids: selectedUserIds,
 		}
 
 		createMutation.mutate(payload, {
