@@ -1,3 +1,12 @@
 .pc-12 .ant-card-body {
 	padding: 12px;
 }
+
+.scrollbar-none {
+	-ms-overflow-style: none; /* IE и Edge */
+	scrollbar-width: none; /* Firefox — ЭТО САМОЕ ГЛАВНОЕ */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+	display: none; /* Chrome, Safari, Opera, новый Edge */
+}

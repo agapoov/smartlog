@@ -1,2 +1,3 @@
 export { tokenService } from './token-service'
-export * as urlUtils from './url-utils' 
+export { useRedirectAfterLogin } from './redirect-login'
+export * as urlUtils from './url-utils'

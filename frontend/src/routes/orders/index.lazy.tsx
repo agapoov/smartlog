@@ -1,10 +1,20 @@
+import { authStore } from '@/features/auth'
 import { OrdersPage } from '@/widgets/OrdersPage'
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createLazyFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
 export const Route = createLazyFileRoute('/orders/')({
 	component: RouteComponent,
 })
 
 function RouteComponent() {
-	return <OrdersPage />
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (!authStore.isAuthenticated) {
+			navigate({ to: '/login', search: { redirect: '/orders/' } })
+		}
+	}, [navigate])
+
+	return authStore.isAuthenticated ? <OrdersPage /> : null
 }
